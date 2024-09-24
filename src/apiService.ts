@@ -1,7 +1,6 @@
 // src/apiService.ts
 import axiosInstance from './axiosInstance';
 
-
 export const getStops = async (): Promise<Stop[]> => {
   try {
     const response = await axiosInstance.get('/region_data_app');
@@ -16,7 +15,6 @@ interface RegionData {
   id: string;
   region_name: string;
 }
-
 
 export const getRegions = async (): Promise<RegionData[]> => {
   try {

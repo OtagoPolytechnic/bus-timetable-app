@@ -1,8 +1,5 @@
-
 // /pages/map.tsx
 import dynamic from 'next/dynamic';
-
-
 
 import React, { useEffect, useRef, useState } from 'react';
 import mapboxgl from 'mapbox-gl';
@@ -10,7 +7,8 @@ import 'mapbox-gl/dist/mapbox-gl.css';
 import MapComponent from '../components/MapComponent';
 import MapTimetable from '../components/MapTimetable';
 
-mapboxgl.accessToken = 'pk.eyJ1IjoiemFjYm1yMjIiLCJhIjoiY2x5ZHRtZDJqMDVsNDJrb3VmZWZoMG9yciJ9.Vid6j50Ey1xMLT6n6g6AgQ';
+mapboxgl.accessToken =
+  'pk.eyJ1IjoiemFjYm1yMjIiLCJhIjoiY2x5ZHRtZDJqMDVsNDJrb3VmZWZoMG9yciJ9.Vid6j50Ey1xMLT6n6g6AgQ';
 
 interface Route {
   title: string;
@@ -24,42 +22,58 @@ const Map: React.FC = () => {
   const [lng, setLng] = useState(170.5046); // Default longitude for Dunedin
   const [lat, setLat] = useState(-45.8788); // Default latitude for Dunedin
   const [zoom, setZoom] = useState(15); // Default zoom level
-  const [userLocation, setUserLocation] = useState<{ lng: number; lat: number } | null>(null);
+  const [userLocation, setUserLocation] = useState<{
+    lng: number;
+    lat: number;
+  } | null>(null);
   const [routes, setRoutes] = useState<Route[]>([]); // State to store the routes
-  const [selectedServices, setSelectedServices] = useState<Array<{ code: string; direction: string }> | null>(null); // State to store the selected route's services
+  const [selectedServices, setSelectedServices] = useState<Array<{
+    code: string;
+    direction: string;
+  }> | null>(null); // State to store the selected route's services
 
   useEffect(() => {
     const fetchTimetableData = async () => {
       const region = 'DUN'; // Region "DUN"
       try {
         console.log(`Fetching timetable data for region: ${region}`);
-        const response = await fetch(`https://bus-app-api-kl95.onrender.com/timetable_data_app/${region}`);
+        const response = await fetch(
+          `https://bus-app-api-kl95.onrender.com/timetable_data_app/${region}`
+        );
         console.log(`Response status: ${response.status}`);
         const data = await response.json();
-        console.log("API Data:", data);
+        console.log('API Data:', data);
 
         if (data && data.routes) {
           setRoutes(data.routes);
         } else {
-          console.warn("No routes found in the response data");
+          console.warn('No routes found in the response data');
           setRoutes([]);
         }
       } catch (error) {
-        console.error("Error fetching timetable data:", error);
+        console.error('Error fetching timetable data:', error);
       }
     };
 
     fetchTimetableData(); // Fetch data for the specified region
   }, []);
 
-  const handleSelectRegion = async (regionTitle: string, services: Array<{ code: string; direction: string }>) => {
+  const handleSelectRegion = async (
+    regionTitle: string,
+    services: Array<{ code: string; direction: string }>
+  ) => {
     setSelectedServices(services);
     try {
-      const response = await fetch(`https://bus-app-api-kl95.onrender.com/regions/${regionTitle}`);
+      const response = await fetch(
+        `https://bus-app-api-kl95.onrender.com/regions/${regionTitle}`
+      );
       const regionData = await response.json();
       console.log(`Data for region title ${regionTitle}:`, regionData);
     } catch (error) {
-      console.error(`Error fetching data for region title ${regionTitle}:`, error);
+      console.error(
+        `Error fetching data for region title ${regionTitle}:`,
+        error
+      );
     }
   };
 
@@ -89,7 +103,9 @@ const Map: React.FC = () => {
       const map = new mapboxgl.Map({
         container: mapContainer.current,
         style: 'mapbox://styles/mapbox/light-v11',
-        center: userLocation ? [userLocation.lng, userLocation.lat] : [lng, lat],
+        center: userLocation
+          ? [userLocation.lng, userLocation.lat]
+          : [lng, lat],
         zoom: zoom,
       });
 
@@ -140,7 +156,13 @@ const Map: React.FC = () => {
   }, [userLocation]);
 
   // Updated getRoute function to handle dotted lines
-  const getRoute = async (map: mapboxgl.Map, start: [number, number], end: [number, number], routeId: string, isDotted: boolean) => {
+  const getRoute = async (
+    map: mapboxgl.Map,
+    start: [number, number],
+    end: [number, number],
+    routeId: string,
+    isDotted: boolean
+  ) => {
     const query = await fetch(
       `https://api.mapbox.com/directions/v5/mapbox/walking/${start[0]},${start[1]};${end[0]},${end[1]}?steps=true&geometries=geojson&access_token=${mapboxgl.accessToken}`,
       { method: 'GET' }
@@ -154,37 +176,42 @@ const Map: React.FC = () => {
       properties: {},
       geometry: {
         type: 'LineString',
-        coordinates: route
-      }
+        coordinates: route,
+      },
     };
 
     if (map.getSource(routeId)) {
-      (map.getSource(routeId) as mapboxgl.GeoJSONSource).setData(geojson as any);
+      (map.getSource(routeId) as mapboxgl.GeoJSONSource).setData(
+        geojson as any
+      );
     } else {
       map.addLayer({
         id: routeId,
         type: 'line',
         source: {
           type: 'geojson',
-          data: geojson
+          data: geojson,
         },
         layout: {
           'line-join': 'round',
-          'line-cap': 'round'
+          'line-cap': 'round',
         },
         paint: {
           'line-color': '#000000', // Changed to black
           'line-width': 5,
           'line-opacity': 0.75,
           'line-dasharray': isDotted ? [2, 2] : [1],
-        }
+        },
       });
     }
   };
 
   return (
     <div className="relative h-screen w-screen">
-      <div ref={mapContainer} className="absolute top-0 left-0 w-full h-full z-0" />
+      <div
+        ref={mapContainer}
+        className="absolute top-0 left-0 w-full h-full z-0"
+      />
       <div className="absolute top-4 left-4 z-10 py-4 px-4">
         <MapComponent routes={routes} onSelectRegion={handleSelectRegion} />
         {selectedServices && selectedServices.length > 0 && (
@@ -196,4 +223,3 @@ const Map: React.FC = () => {
 };
 
 export default Map;
-

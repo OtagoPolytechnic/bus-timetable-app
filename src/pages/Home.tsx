@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useRouter } from 'next/router';  // Import useRouter from next/router
+import { useRouter } from 'next/router'; // Import useRouter from next/router
 
 const Home: React.FC = () => {
   const [selectedArea, setSelectedArea] = useState<string | null>(null);
@@ -8,15 +8,17 @@ const Home: React.FC = () => {
   const [timetableData, setTimetableData] = useState<any>({});
   const [currentPage, setCurrentPage] = useState<number>(1);
 
-  const router = useRouter();  // Initialize useRouter
+  const router = useRouter(); // Initialize useRouter
 
   const fetchTimetableData = async (region: string) => {
     try {
-      const response = await fetch(`https://bus-app-api-kl95.onrender.com/timetable_data_app/${region}`);
+      const response = await fetch(
+        `https://bus-app-api-kl95.onrender.com/timetable_data_app/${region}`
+      );
       const data = await response.json();
       setTimetableData({ [region]: data.routes });
     } catch (error) {
-      console.error("Error fetching timetable data:", error);
+      console.error('Error fetching timetable data:', error);
     }
   };
 
@@ -44,14 +46,25 @@ const Home: React.FC = () => {
   };
 
   const goToMap = () => {
-    router.push('/map');  // Navigate to the Map component
+    router.push('/map'); // Navigate to the Map component
   };
-  
 
   const sampleStops = [
-    { stop_name: "Middleton Rd, 292", times: ["6:32 PM", "7:02 PM", "7:32 PM"], next_service: "10:32 PM" },
-    { stop_name: "Middleton Rd, 240", times: ["6:33 PM", "7:03 PM", "7:33 PM"], next_service: "10:33 PM" },
-    { stop_name: "Corstorphine Rd, 136", times: ["6:35 PM", "7:05 PM", "7:35 PM"], next_service: "10:35 PM" },
+    {
+      stop_name: 'Middleton Rd, 292',
+      times: ['6:32 PM', '7:02 PM', '7:32 PM'],
+      next_service: '10:32 PM',
+    },
+    {
+      stop_name: 'Middleton Rd, 240',
+      times: ['6:33 PM', '7:03 PM', '7:33 PM'],
+      next_service: '10:33 PM',
+    },
+    {
+      stop_name: 'Corstorphine Rd, 136',
+      times: ['6:35 PM', '7:05 PM', '7:35 PM'],
+      next_service: '10:35 PM',
+    },
   ];
 
   return (
@@ -66,14 +79,14 @@ const Home: React.FC = () => {
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
             <button
               className="m-2 p-4 font-bold rounded-lg shadow-lg transform transition-transform duration-300 hover:scale-105"
-              onClick={() => handleAreaSelect("DUN")}
+              onClick={() => handleAreaSelect('DUN')}
               style={{ backgroundColor: '#FFFACD', color: 'black' }}
             >
               Dunedin
             </button>
             <button
               className="m-2 p-4 font-bold rounded-lg shadow-lg transform transition-transform duration-300 hover:scale-105"
-              onClick={() => handleAreaSelect("QUEENSTOWN")}
+              onClick={() => handleAreaSelect('QUEENSTOWN')}
               style={{ backgroundColor: '#FFFACD', color: 'black' }}
             >
               Queenstown
@@ -85,7 +98,8 @@ const Home: React.FC = () => {
       {currentPage === 2 && selectedArea && (
         <div className="text-center">
           <h2 className="text-3xl font-semibold mb-6">Select a Route</h2>
-          {timetableData[selectedArea] && timetableData[selectedArea].length > 0 ? (
+          {timetableData[selectedArea] &&
+          timetableData[selectedArea].length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
               {timetableData[selectedArea].map((route: any) => (
                 <button
@@ -112,7 +126,9 @@ const Home: React.FC = () => {
 
       {currentPage === 3 && selectedRoute && (
         <div className="w-full max-w-4xl bg-white p-6 rounded-lg shadow-lg mt-8">
-          <h2 className="text-3xl font-semibold mb-6 text-center">Services for Route {selectedRoute.title}</h2>
+          <h2 className="text-3xl font-semibold mb-6 text-center">
+            Services for Route {selectedRoute.title}
+          </h2>
           <div className="grid grid-cols-1 gap-6">
             {selectedRoute.services && selectedRoute.services.length > 0 ? (
               selectedRoute.services.map((service: any) => (
@@ -121,7 +137,9 @@ const Home: React.FC = () => {
                   className="p-4 bg-blue-100 rounded-lg shadow-lg transform transition-transform duration-300 hover:scale-105 cursor-pointer"
                   onClick={() => handleServiceSelect(service)}
                 >
-                  <h3 className="text-lg font-bold text-blue-700 mb-1">Service {service.code}</h3>
+                  <h3 className="text-lg font-bold text-blue-700 mb-1">
+                    Service {service.code}
+                  </h3>
                   <p className="text-sm text-gray-700">{service.direction}</p>
                 </div>
               ))
@@ -140,7 +158,9 @@ const Home: React.FC = () => {
 
       {currentPage === 4 && selectedService && (
         <div className="w-full max-w-4xl bg-white p-6 rounded-lg shadow-lg mt-8">
-          <h2 className="text-3xl font-semibold mb-6 text-center">Stops for {selectedService.code}</h2>
+          <h2 className="text-3xl font-semibold mb-6 text-center">
+            Stops for {selectedService.code}
+          </h2>
           <div className="flex justify-between items-center mb-4">
             <div className="flex items-center">
               <div className="text-gray-600 mr-2">Select date:</div>
@@ -150,9 +170,9 @@ const Home: React.FC = () => {
                 defaultValue={new Date().toISOString().substr(0, 10)}
               />
             </div>
-            <button 
+            <button
               className="px-4 py-2 bg-gradient-to-r from-green-400 to-blue-500 text-white font-bold rounded-lg shadow-lg transform transition-transform duration-300 hover:scale-105"
-              onClick={goToMap}  // Trigger navigation on click
+              onClick={goToMap} // Trigger navigation on click
             >
               Map
             </button>
@@ -160,21 +180,40 @@ const Home: React.FC = () => {
           <table className="min-w-full table-auto">
             <thead className="bg-gray-50">
               <tr>
-                <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">All stops</th>
-                <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">6:32 PM</th>
-                <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">7:02 PM</th>
-                <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">7:32 PM</th>
-                <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">Next Service</th>
+                <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">
+                  All stops
+                </th>
+                <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">
+                  6:32 PM
+                </th>
+                <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">
+                  7:02 PM
+                </th>
+                <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">
+                  7:32 PM
+                </th>
+                <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">
+                  Next Service
+                </th>
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
               {sampleStops.map((stop, index) => (
                 <tr key={index}>
-                  <td className="px-6 py-4 text-sm text-gray-700">{stop.stop_name}</td>
+                  <td className="px-6 py-4 text-sm text-gray-700">
+                    {stop.stop_name}
+                  </td>
                   {stop.times.map((time, timeIndex) => (
-                    <td key={timeIndex} className="px-6 py-4 text-sm text-gray-700">{time}</td>
+                    <td
+                      key={timeIndex}
+                      className="px-6 py-4 text-sm text-gray-700"
+                    >
+                      {time}
+                    </td>
                   ))}
-                  <td className="px-6 py-4 text-sm text-gray-700">{stop.next_service}</td>
+                  <td className="px-6 py-4 text-sm text-gray-700">
+                    {stop.next_service}
+                  </td>
                 </tr>
               ))}
             </tbody>

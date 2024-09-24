@@ -3,8 +3,6 @@ import { ChevronLeft, Navigation, MapPin, ChevronDown } from 'lucide-react';
 
 import 'mapbox-gl/dist/mapbox-gl.css';
 
-
-
 interface Route {
   title: string;
   locations: string;
@@ -14,14 +12,24 @@ interface Route {
 interface MapComponentProps {
   currentLocation?: string;
   routes: Route[];
-  onSelectRegion: (regionTitle: string, services: Array<{ code: string; direction: string }>) => void;
+  onSelectRegion: (
+    regionTitle: string,
+    services: Array<{ code: string; direction: string }>
+  ) => void;
 }
 
-const MapComponent: React.FC<MapComponentProps> = ({ currentLocation, routes, onSelectRegion }) => {
+const MapComponent: React.FC<MapComponentProps> = ({
+  currentLocation,
+  routes,
+  onSelectRegion,
+}) => {
   const [showDropdown1, setShowDropdown1] = useState(false);
   const [showDropdown2, setShowDropdown2] = useState(false);
-  const [streetName, setStreetName] = useState<string>('Stuart Street, Dunedin, NZ');
-  const [selectedLocation, setSelectedLocation] = useState<string>('Current Location');
+  const [streetName, setStreetName] = useState<string>(
+    'Stuart Street, Dunedin, NZ'
+  );
+  const [selectedLocation, setSelectedLocation] =
+    useState<string>('Current Location');
   const [selectedRoute, setSelectedRoute] = useState<string | null>(null);
 
   useEffect(() => {
@@ -59,7 +67,9 @@ const MapComponent: React.FC<MapComponentProps> = ({ currentLocation, routes, on
         <ChevronLeft className="mr-2 text-gray-800 cursor-pointer" />
         <h1 className="text-lg font-bold text-gray-800">{streetName}</h1>
       </div>
-      <p className="text-gray-600 font-medium pb-6 text-sm px-10">Welcome to the map!</p>
+      <p className="text-gray-600 font-medium pb-6 text-sm px-10">
+        Welcome to the map!
+      </p>
 
       <div className="mt-4">
         <div
@@ -95,7 +105,9 @@ const MapComponent: React.FC<MapComponentProps> = ({ currentLocation, routes, on
         >
           <div className="flex items-center">
             <MapPin className="mr-2 h-4 w-4" />
-            <span>{selectedRoute ? selectedRoute : "Where you want to go"}</span>
+            <span>
+              {selectedRoute ? selectedRoute : 'Where you want to go'}
+            </span>
           </div>
           <ChevronDown className="h-4 w-4" />
         </div>

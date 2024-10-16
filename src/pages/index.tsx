@@ -3,7 +3,8 @@ import { useRouter } from 'next/router';
 import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
 
-mapboxgl.accessToken = 'pk.eyJ1IjoiemFjYm1yMjIiLCJhIjoiY2x5ZHRtZDJqMDVsNDJrb3VmZWZoMG9yciJ9.Vid6j50Ey1xMLT6n6g6AgQ';
+mapboxgl.accessToken =
+  'pk.eyJ1IjoiemFjYm1yMjIiLCJhIjoiY2x5ZHRtZDJqMDVsNDJrb3VmZWZoMG9yciJ9.Vid6j50Ey1xMLT6n6g6AgQ';
 
 const CombinedPage: React.FC = () => {
   const [selectedArea, setSelectedArea] = useState<string | null>(null);
@@ -23,7 +24,9 @@ const CombinedPage: React.FC = () => {
   useEffect(() => {
     const fetchRegions = async () => {
       try {
-        const response = await fetch('https://bus-app-api-kl95.onrender.com/region_data_app');
+        const response = await fetch(
+          'https://bus-app-api-kl95.onrender.com/region_data_app'
+        );
         const data = await response.json();
         setRegions(data.data);
         setLoading(false);
@@ -40,7 +43,7 @@ const CombinedPage: React.FC = () => {
       const map = new mapboxgl.Map({
         container: mapContainer.current,
         style: 'mapbox://styles/mapbox/light-v11',
-        center: [172.6362, -41.5000],
+        center: [172.6362, -41.5],
         zoom: 5,
       });
 
@@ -55,7 +58,9 @@ const CombinedPage: React.FC = () => {
 
   const fetchTimetableData = async (region: string) => {
     try {
-      const response = await fetch(`https://bus-app-api-kl95.onrender.com/timetable_data_app/${region}`);
+      const response = await fetch(
+        `https://bus-app-api-kl95.onrender.com/timetable_data_app/${region}`
+      );
       const data = await response.json();
       setTimetableData({ [region]: data.routes });
     } catch (error) {
@@ -70,8 +75,8 @@ const CombinedPage: React.FC = () => {
     setCurrentPage(2);
     fetchTimetableData(area);
 
-    if (mapInstance.current && regions.find(r => r.id === area)) {
-      const regionData = regions.find(r => r.id === area);
+    if (mapInstance.current && regions.find((r) => r.id === area)) {
+      const regionData = regions.find((r) => r.id === area);
       const { lng, lat, zoom } = regionData;
       mapInstance.current.flyTo({
         center: [lng || 170.5046, lat || -45.8788],
@@ -93,14 +98,21 @@ const CombinedPage: React.FC = () => {
   };
 
   const getCurrentDayTrips = (service: any) => {
-    const today = new Date().toLocaleString('en-US', { weekday: 'short' }).toUpperCase();
+    const today = new Date()
+      .toLocaleString('en-US', { weekday: 'short' })
+      .toUpperCase();
     return service.trips.filter((trip: any) =>
       trip.days.some((day: any) => day.day === today)
     );
   };
 
-  const getStopsForCurrentServiceVersion = (service: any, serviceVersion: number) => {
-    const versionData = service.service_versions.find((version: any) => version.version === serviceVersion);
+  const getStopsForCurrentServiceVersion = (
+    service: any,
+    serviceVersion: number
+  ) => {
+    const versionData = service.service_versions.find(
+      (version: any) => version.version === serviceVersion
+    );
     return versionData ? versionData.stops : [];
   };
 
@@ -122,7 +134,11 @@ const CombinedPage: React.FC = () => {
     tripStartTime.setMinutes(minutes);
 
     const stopTime = new Date(tripStartTime.getTime() + increment * 60000);
-    return stopTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true });
+    return stopTime.toLocaleTimeString([], {
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: true,
+    });
   };
 
   return (
@@ -134,16 +150,21 @@ const CombinedPage: React.FC = () => {
       />
 
       <div className="relative z-10 flex flex-col justify-center items-center h-full">
-      <div className={`p-6 rounded-lg  max-w-4xl w-full ${currentPage === 4 ? '' : 'bg-white bg-opacity-90'}`}>
-        {currentPage !== 4 && (
-          
-        <h1 className="text-4xl font-bold text-blue-700 mb-6 text-center">Bus Timetable</h1>
+        <div
+          className={`p-6 rounded-lg  max-w-4xl w-full ${currentPage === 4 ? '' : 'bg-white bg-opacity-90'}`}
+        >
+          {currentPage !== 4 && (
+            <h1 className="text-4xl font-bold text-blue-700 mb-6 text-center">
+              Bus Timetable
+            </h1>
           )}
           {loading ? (
             <p>Loading regions...</p>
           ) : currentPage === 1 ? (
             <div className="text-center">
-              <h2 className="text-3xl font-semibold mb-6">Choose Your Region</h2>
+              <h2 className="text-3xl font-semibold mb-6">
+                Choose Your Region
+              </h2>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                 {regions.length > 0 ? (
                   regions.map((region: any) => (
@@ -166,7 +187,8 @@ const CombinedPage: React.FC = () => {
           {currentPage === 2 && selectedArea && (
             <div className="text-center">
               <h2 className="text-3xl font-semibold mb-6">Select a Route</h2>
-              {timetableData[selectedArea] && timetableData[selectedArea].length > 0 ? (
+              {timetableData[selectedArea] &&
+              timetableData[selectedArea].length > 0 ? (
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
                   {timetableData[selectedArea].map((route: any) => (
                     <button
@@ -194,7 +216,9 @@ const CombinedPage: React.FC = () => {
 
           {currentPage === 3 && selectedRoute && (
             <div className="text-center">
-              <h2 className="text-3xl font-semibold mb-6">Services for Route {selectedRoute.title}</h2>
+              <h2 className="text-3xl font-semibold mb-6">
+                Services for Route {selectedRoute.title}
+              </h2>
               <div className="grid grid-cols-1 gap-6">
                 {selectedRoute.services && selectedRoute.services.length > 0 ? (
                   selectedRoute.services.map((service: any) => (
@@ -206,8 +230,12 @@ const CombinedPage: React.FC = () => {
                         setCurrentPage(4);
                       }}
                     >
-                     
-                     <p className="text-1xl font-bold mb-6" style={{ color: 'darkblue' }}>{service.direction}</p>
+                      <p
+                        className="text-1xl font-bold mb-6"
+                        style={{ color: 'darkblue' }}
+                      >
+                        {service.direction}
+                      </p>
                     </div>
                   ))
                 ) : (
@@ -224,64 +252,72 @@ const CombinedPage: React.FC = () => {
             </div>
           )}
 
-           {/* Stops display container moved upwards */}
-           {currentPage === 4 && selectedService && (
-  <div className="w-full md:w-1/2 lg:w-1/3 h-3/4 bg-white p-6 rounded-lg shadow-lg absolute top-20 left-5 sm:left-10">
-    <h2 className="text-2xl md:text-3xl font-semibold mb-6 text-center">
-      Stops for {selectedService.code}
-    </h2>
+          {/* Stops display container moved upwards */}
+          {currentPage === 4 && selectedService && (
+            <div className="w-full md:w-1/2 lg:w-1/3 h-3/4 bg-white p-6 rounded-lg shadow-lg absolute top-20 left-5 sm:left-10">
+              <h2 className="text-2xl md:text-3xl font-semibold mb-6 text-center">
+                Stops for {selectedService.code}
+              </h2>
 
-    <div className="flex justify-between items-center mb-4">
-      <button
-        className="px-2 md:px-4 py-2 bg-blue-500 text-white font-bold rounded-lg shadow-lg"
-        onClick={handlePrevColumn}
-        disabled={visibleColumn === 0}
-      >
-        &lt;
-      </button>
-      <button
-        className="px-2 md:px-4 py-2 bg-blue-500 text-white font-bold rounded-lg shadow-lg"
-        onClick={handleNextColumn}
-      >
-        &gt;
-      </button>
-    </div>
+              <div className="flex justify-between items-center mb-4">
+                <button
+                  className="px-2 md:px-4 py-2 bg-blue-500 text-white font-bold rounded-lg shadow-lg"
+                  onClick={handlePrevColumn}
+                  disabled={visibleColumn === 0}
+                >
+                  &lt;
+                </button>
+                <button
+                  className="px-2 md:px-4 py-2 bg-blue-500 text-white font-bold rounded-lg shadow-lg"
+                  onClick={handleNextColumn}
+                >
+                  &gt;
+                </button>
+              </div>
 
-    {/* Stops Table */}
-    <table className="min-w-full table-auto">
-      <thead className="bg-gray-50">
-        <tr>
-          <th className="px-4 py-2 md:px-6 md:py-3 text-left text-xs md:text-sm font-medium text-gray-700">
-            Stop Name
-          </th>
-          <th className="px-4 py-2 md:px-6 md:py-3 text-left text-xs md:text-sm font-medium text-gray-700">
-            Time
-          </th>
-        </tr>
-      </thead>
-      <tbody className="bg-white divide-y divide-gray-200">
-        {getCurrentDayTrips(selectedService).map((trip: any, index: number) => (
-          <React.Fragment key={index}>
-            {getStopsForCurrentServiceVersion(selectedService, trip.service_version).map((stop: any, stopIndex: number) => (
-              <tr key={stopIndex}>
-                <td className="px-4 py-2 md:px-6 md:py-4 text-xs md:text-sm text-gray-700">
-                  {stop.address}
-                </td>
-                <td className="px-4 py-2 md:px-6 md:py-4 text-xs md:text-sm text-gray-700">
-                  {calculateStopTime(trip.start_time, stop.increment + visibleColumn * 30)}
-                </td>
-              </tr>
-            ))}
-          </React.Fragment>
-        ))}
-      </tbody>
-    </table>
+              {/* Stops Table */}
+              <table className="min-w-full table-auto">
+                <thead className="bg-gray-50">
+                  <tr>
+                    <th className="px-4 py-2 md:px-6 md:py-3 text-left text-xs md:text-sm font-medium text-gray-700">
+                      Stop Name
+                    </th>
+                    <th className="px-4 py-2 md:px-6 md:py-3 text-left text-xs md:text-sm font-medium text-gray-700">
+                      Time
+                    </th>
+                  </tr>
+                </thead>
+                <tbody className="bg-white divide-y divide-gray-200">
+                  {getCurrentDayTrips(selectedService).map(
+                    (trip: any, index: number) => (
+                      <React.Fragment key={index}>
+                        {getStopsForCurrentServiceVersion(
+                          selectedService,
+                          trip.service_version
+                        ).map((stop: any, stopIndex: number) => (
+                          <tr key={stopIndex}>
+                            <td className="px-4 py-2 md:px-6 md:py-4 text-xs md:text-sm text-gray-700">
+                              {stop.address}
+                            </td>
+                            <td className="px-4 py-2 md:px-6 md:py-4 text-xs md:text-sm text-gray-700">
+                              {calculateStopTime(
+                                trip.start_time,
+                                stop.increment + visibleColumn * 30
+                              )}
+                            </td>
+                          </tr>
+                        ))}
+                      </React.Fragment>
+                    )
+                  )}
+                </tbody>
+              </table>
 
-    <button
-      className="mm-2 p-4 font-bold rounded-lg shadow-lg transform transition-transform duration-300 hover:scale-105"
-      onClick={goBack}
-      style={{ backgroundColor: 'lightgrey', color: 'black' }}
-    >
+              <button
+                className="mm-2 p-4 font-bold rounded-lg shadow-lg transform transition-transform duration-300 hover:scale-105"
+                onClick={goBack}
+                style={{ backgroundColor: 'lightgrey', color: 'black' }}
+              >
                 Back to Services
               </button>
             </div>

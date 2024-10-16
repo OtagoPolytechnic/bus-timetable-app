@@ -16,7 +16,9 @@ const Home: React.FC = () => {
   useEffect(() => {
     const fetchRegions = async () => {
       try {
-        const response = await fetch('https://bus-app-api-kl95.onrender.com/region_data_app');
+        const response = await fetch(
+          'https://bus-app-api-kl95.onrender.com/region_data_app'
+        );
         const data = await response.json();
         setRegions(data.data);
         setLoading(false);
@@ -37,11 +39,13 @@ const Home: React.FC = () => {
 
   const fetchTimetableData = async (region: string) => {
     try {
-      const response = await fetch(`https://bus-app-api-kl95.onrender.com/timetable_data_app/${region}`);
+      const response = await fetch(
+        `https://bus-app-api-kl95.onrender.com/timetable_data_app/${region}`
+      );
       const data = await response.json();
       setTimetableData({ [region]: data.routes });
     } catch (error) {
-      console.error("Error fetching timetable data:", error);
+      console.error('Error fetching timetable data:', error);
     }
   };
 
@@ -57,7 +61,9 @@ const Home: React.FC = () => {
   };
 
   const getCurrentDayTrips = (service: any) => {
-    const today = new Date().toLocaleString('en-US', { weekday: 'short' }).toUpperCase();
+    const today = new Date()
+      .toLocaleString('en-US', { weekday: 'short' })
+      .toUpperCase();
     return service.trips.filter((trip: any) =>
       trip.days.some((day: any) => day.day === today)
     );
@@ -76,7 +82,10 @@ const Home: React.FC = () => {
   const calculateStopTime = (startTime: string, increment: number) => {
     const tripStartTime = new Date(`1970-01-01T${startTime}:00`);
     const stopTime = new Date(tripStartTime.getTime() + increment * 60000);
-    return stopTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    return stopTime.toLocaleTimeString([], {
+      hour: '2-digit',
+      minute: '2-digit',
+    });
   };
 
   return (
@@ -133,7 +142,9 @@ const Home: React.FC = () => {
 
       {currentPage === 3 && selectedRoute && (
         <div className="text-center">
-          <h2 className="text-3xl font-semibold mb-6">Services for Route {selectedRoute.title}</h2>
+          <h2 className="text-3xl font-semibold mb-6">
+            Services for Route {selectedRoute.title}
+          </h2>
           <div className="grid grid-cols-1 gap-6">
             {selectedRoute.services.map((service: any) => (
               <div
@@ -144,7 +155,9 @@ const Home: React.FC = () => {
                   setCurrentPage(4);
                 }}
               >
-                <h3 className="text-lg font-bold text-blue-700 mb-1">Service {service.code}</h3>
+                <h3 className="text-lg font-bold text-blue-700 mb-1">
+                  Service {service.code}
+                </h3>
                 <p className="text-sm text-gray-700">{service.direction}</p>
               </div>
             ))}
@@ -160,52 +173,67 @@ const Home: React.FC = () => {
 
       {currentPage === 4 && selectedService && (
         <div className="w-full max-w-4xl bg-white p-6 rounded-lg shadow-lg mt-8">
-          <h2 className="text-3xl font-semibold mb-6 text-center">Stops for {selectedService.code}</h2>
+          <h2 className="text-3xl font-semibold mb-6 text-center">
+            Stops for {selectedService.code}
+          </h2>
 
-          {getCurrentDayTrips(selectedService).map((trip: any, index: number) => (
-            <div key={index} className="mb-4">
-              <div className="flex justify-between items-center mb-2">
-                {/* <h3 className="text-lg font-bold text-gray-700">Trip Start Time: {trip.start_time}</h3> */}
-              </div>
+          {getCurrentDayTrips(selectedService).map(
+            (trip: any, index: number) => (
+              <div key={index} className="mb-4">
+                <div className="flex justify-between items-center mb-2">
+                  {/* <h3 className="text-lg font-bold text-gray-700">Trip Start Time: {trip.start_time}</h3> */}
+                </div>
 
-              {/* Arrows for navigating time columns */}
-              <div className="flex justify-between mb-4">
-                <button
-                  className="px-4 py-2 bg-blue-500 text-white font-bold rounded-lg shadow-lg"
-                  onClick={handlePrevColumn}
-                  disabled={visibleColumn === 0}
-                >
-                  &lt;
-                </button>
-                <button
-                  className="px-4 py-2 bg-blue-500 text-white font-bold rounded-lg shadow-lg"
-                  onClick={handleNextColumn}
-                >
-                  &gt;
-                </button>
-              </div>
+                {/* Arrows for navigating time columns */}
+                <div className="flex justify-between mb-4">
+                  <button
+                    className="px-4 py-2 bg-blue-500 text-white font-bold rounded-lg shadow-lg"
+                    onClick={handlePrevColumn}
+                    disabled={visibleColumn === 0}
+                  >
+                    &lt;
+                  </button>
+                  <button
+                    className="px-4 py-2 bg-blue-500 text-white font-bold rounded-lg shadow-lg"
+                    onClick={handleNextColumn}
+                  >
+                    &gt;
+                  </button>
+                </div>
 
-              {/* Display the stops and calculated times */}
-              <table className="min-w-full table-auto">
-                <thead className="bg-gray-50">
-                  <tr>
-                    <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">Stop Name</th>
-                    <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">Time</th>
-                  </tr>
-                </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
-                  {selectedService.service_versions[0]?.stops.map((stop: any, stopIndex: number) => (
-                    <tr key={stop.stop_id}>
-                      <td className="px-6 py-4 text-sm text-gray-700">{stop.address}</td>
-                      <td className="px-6 py-4 text-sm text-gray-700">
-                        {calculateStopTime(trip.start_time, stop.increment + visibleColumn * 30)}
-                      </td>
+                {/* Display the stops and calculated times */}
+                <table className="min-w-full table-auto">
+                  <thead className="bg-gray-50">
+                    <tr>
+                      <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">
+                        Stop Name
+                      </th>
+                      <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">
+                        Time
+                      </th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          ))}
+                  </thead>
+                  <tbody className="bg-white divide-y divide-gray-200">
+                    {selectedService.service_versions[0]?.stops.map(
+                      (stop: any, stopIndex: number) => (
+                        <tr key={stop.stop_id}>
+                          <td className="px-6 py-4 text-sm text-gray-700">
+                            {stop.address}
+                          </td>
+                          <td className="px-6 py-4 text-sm text-gray-700">
+                            {calculateStopTime(
+                              trip.start_time,
+                              stop.increment + visibleColumn * 30
+                            )}
+                          </td>
+                        </tr>
+                      )
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            )
+          )}
 
           <button
             className="mt-6 px-4 py-2 bg-gradient-to-r from-red-500 to-pink-500 text-white font-bold rounded-lg shadow-lg"
@@ -213,7 +241,7 @@ const Home: React.FC = () => {
           >
             Back to Services
           </button>
-          </div>
+        </div>
       )}
     </div>
   );

@@ -20,7 +20,7 @@ const CombinedPage: React.FC = () => {
   const mapInstance = useRef<mapboxgl.Map | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
 
-
+  // Fetch regions on initial load
   useEffect(() => {
     const fetchRegions = async () => {
       try {
@@ -36,6 +36,7 @@ const CombinedPage: React.FC = () => {
     fetchRegions();
   }, []);
 
+  // Initialize mapbox map
   useEffect(() => {
     if (mapContainer.current) {
       const map = new mapboxgl.Map({
@@ -54,6 +55,7 @@ const CombinedPage: React.FC = () => {
     }
   }, []);
 
+  // Fetch timetable data for the selected region
   const fetchTimetableData = async (region: string) => {
     try {
       const response = await fetch(`https://bus-app-api-kl95.onrender.com/timetable_data_app/${region}`);
@@ -64,6 +66,7 @@ const CombinedPage: React.FC = () => {
     }
   };
 
+  // Handle region selection
   const handleAreaSelect = (area: string) => {
     setSelectedArea(area);
     setSelectedRoute(null);
@@ -71,8 +74,9 @@ const CombinedPage: React.FC = () => {
     setCurrentPage(2);
     fetchTimetableData(area);
 
-    if (mapInstance.current && regions.find(r => r.id === area)) {
-      const regionData = regions.find(r => r.id === area);
+    // Fly to region on map
+    if (mapInstance.current && regions.find((r) => r.id === area)) {
+      const regionData = regions.find((r) => r.id === area);
       const { lng, lat, zoom } = regionData;
       mapInstance.current.flyTo({
         center: [lng || 170.5046, lat || -45.8788],
@@ -82,17 +86,20 @@ const CombinedPage: React.FC = () => {
     }
   };
 
+  // Handle route selection
   const handleRouteSelect = (route: any) => {
     setSelectedRoute(route);
     setCurrentPage(3);
   };
 
+  // Handle going back through pages
   const goBack = () => {
     if (currentPage > 1) {
       setCurrentPage(currentPage - 1);
     }
   };
 
+  // Get trips for the current day
   const getCurrentDayTrips = (service: any) => {
     const today = new Date().toLocaleString('en-US', { weekday: 'short' }).toUpperCase();
     return service.trips.filter((trip: any) =>
@@ -100,12 +107,13 @@ const CombinedPage: React.FC = () => {
     );
   };
 
+  // Get stops for the current service version
   const getStopsForCurrentServiceVersion = (service: any, serviceVersion: number) => {
     const versionData = service.service_versions.find((version: any) => version.version === serviceVersion);
     return versionData ? versionData.stops : [];
   };
 
-  // Fixing the time increment feature
+  // Calculate stop times
   const calculateStopTime = (startTime: string, increment: number) => {
     const [hours, minutes] = startTime.split(':').map(Number);
     const tripStartTime = new Date();
@@ -125,45 +133,48 @@ const CombinedPage: React.FC = () => {
       />
 
       <div className="relative z-10 flex flex-col justify-center items-center h-full">
-        <div className="bg-white bg-opacity-90 p-6 rounded-lg shadow-lg max-w-4xl w-full">
-          <h1 className="text-4xl font-bold text-blue-700 mb-6 text-center">Bus Timetable</h1>
+        {/* Hide header and container when on StopsDisplay (currentPage === 4) */}
+        {currentPage !== 4 && (
+          <div className="bg-white bg-opacity-90 p-6 rounded-lg shadow-lg max-w-4xl w-full">
+            <h1 className="text-4xl font-bold text-black mb-6 text-center">Bus Timetable</h1>
 
-          {loading ? (
-            <p>Loading regions...</p>
-          ) : currentPage === 1 ? (
-            <RegionSelector regions={regions} onAreaSelect={handleAreaSelect} />
-          ) : null}
+            {loading ? (
+              <p>Loading regions...</p>
+            ) : currentPage === 1 ? (
+              <RegionSelector regions={regions} onAreaSelect={handleAreaSelect} />
+            ) : null}
 
-          {currentPage === 2 && selectedArea && (
-            <RouteSelector
-              selectedArea={selectedArea}
-              timetableData={timetableData}
-              onRouteSelect={handleRouteSelect}
-              onBack={goBack}
-            />
-          )}
+            {currentPage === 2 && selectedArea && (
+              <RouteSelector
+                selectedArea={selectedArea}
+                timetableData={timetableData}
+                onRouteSelect={handleRouteSelect}
+                onBack={goBack}
+              />
+            )}
 
-          {currentPage === 3 && selectedRoute && (
-            <ServiceSelector
-              selectedRoute={selectedRoute}
-              onServiceSelect={(service) => {
-                setSelectedService(service);
-                setCurrentPage(4);
-              }}
-              onBack={goBack}
-            />
-          )}
+            {currentPage === 3 && selectedRoute && (
+              <ServiceSelector
+                selectedRoute={selectedRoute}
+                onServiceSelect={(service) => {
+                  setSelectedService(service);
+                  setCurrentPage(4);
+                }}
+                onBack={goBack}
+              />
+            )}
+          </div>
+        )}
 
-          {currentPage === 4 && selectedService && (
-            <StopsDisplay
-              selectedService={selectedService}
-              getCurrentDayTrips={getCurrentDayTrips}
-              getStopsForCurrentServiceVersion={getStopsForCurrentServiceVersion}
-              calculateStopTime={calculateStopTime}
-              onBack={goBack}
-            />
-          )}
-        </div>
+        {currentPage === 4 && selectedService && (
+          <StopsDisplay
+            selectedService={selectedService}
+            getCurrentDayTrips={getCurrentDayTrips}
+            getStopsForCurrentServiceVersion={getStopsForCurrentServiceVersion}
+            calculateStopTime={calculateStopTime}
+            onBack={goBack}
+          />
+        )}
       </div>
 
       {/* Loading indicator for the map */}

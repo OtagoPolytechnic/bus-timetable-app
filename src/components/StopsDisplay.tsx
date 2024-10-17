@@ -27,9 +27,14 @@ const StopsDisplay: React.FC<StopsDisplayProps> = ({
     }
   };
 
+  const trips = getCurrentDayTrips(selectedService);
+
   return (
-    <div className="w-full max-w-4xl bg-white p-6 rounded-lg shadow-lg mt-8">
-      <h2 className="text-3xl font-semibold mb-6 text-center">
+    <div
+      className="absolute top-8 left-8 bg-white p-6 rounded-lg shadow-lg w-96"
+      style={{ zIndex: 20 }}
+    >
+      <h2 className="text-2xl font-semibold mb-4 text-center">
         Stops for {selectedService.code}
       </h2>
 
@@ -57,23 +62,24 @@ const StopsDisplay: React.FC<StopsDisplayProps> = ({
           </tr>
         </thead>
         <tbody className="bg-white divide-y divide-gray-200">
-          {getCurrentDayTrips(selectedService).map((trip: any, index: number) => (
-            <React.Fragment key={index}>
-              {getStopsForCurrentServiceVersion(selectedService, trip.service_version).map((stop: any, stopIndex: number) => (
-                <tr key={stopIndex}>
-                  <td className="px-6 py-4 text-sm text-gray-700">{stop.address}</td>
-                  <td className="px-6 py-4 text-sm text-gray-700">
-                    {calculateStopTime(trip.start_time, stop.increment + visibleColumn * 30)}
-                  </td>
-                </tr>
-              ))}
-            </React.Fragment>
-          ))}
+          {trips.map((trip: any, index: number) => {
+            const stops = getStopsForCurrentServiceVersion(selectedService, trip.service_version);
+            return stops.map((stop: any, stopIndex: number) => (
+              <tr key={`${index}-${stopIndex}`}>
+                <td className="px-6 py-4 text-sm text-gray-700">{stop.address}</td>
+                <td className="px-6 py-4 text-sm text-gray-700">
+                  {calculateStopTime(trip.start_time, stop.increment + visibleColumn * 30)}
+                </td>
+              </tr>
+            ));
+          })}
         </tbody>
       </table>
+
       <button
-        className="mt-6 px-4 py-2 bg-gradient-to-r from-red-500 to-pink-500 text-white font-bold rounded-lg shadow-lg"
+        className="mt-6 px-4 py-2 text-black font-bold rounded-lg shadow-lg transform transition-transform duration-300 hover:scale-105"
         onClick={onBack}
+        style={{ backgroundColor: 'var(--global-red)', color: 'white' }}
       >
         Back to Services
       </button>

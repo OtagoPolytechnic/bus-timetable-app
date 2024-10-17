@@ -9,7 +9,7 @@ interface ServiceSelectorProps {
 const ServiceSelector: React.FC<ServiceSelectorProps> = ({ selectedRoute, onServiceSelect, onBack }) => {
   return (
     <div className="text-center">
-      <h2 className="text-3xl font-semibold mb-6">Services for Route {selectedRoute.title}</h2>
+      <h2 className="text-xl font-semibold mb-6 pb-12">Services for Route {selectedRoute.title}</h2>
       <div className="grid grid-cols-1 gap-6">
         {selectedRoute.services && selectedRoute.services.length > 0 ? (
           selectedRoute.services.map((service: any) => (
@@ -27,11 +27,12 @@ const ServiceSelector: React.FC<ServiceSelectorProps> = ({ selectedRoute, onServ
         )}
       </div>
       <button
-        className="mt-6 px-4 py-2 bg-gradient-to-r from-red-500 to-pink-500 text-white font-bold rounded-lg shadow-lg hover:from-red-600 hover:to-pink-600 transform transition-transform duration-300 hover:scale-105"
-        onClick={onBack}
-      >
-        Back to Routes
-      </button>
+      className="mt-6 px-4 py-2 text-black font-bold rounded-lg shadow-lg transform transition-transform duration-300 hover:scale-105 "
+      onClick={onBack}
+      style={{ backgroundColor: 'var(--secondary-blue)', color: 'black' }}
+    >
+      Back to Routes
+    </button>
     </div>
   );
 };

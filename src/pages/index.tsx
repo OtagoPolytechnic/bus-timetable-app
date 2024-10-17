@@ -6,7 +6,7 @@ import RouteSelector from '../components/RouteSelector';
 import ServiceSelector from '../components/ServiceSelector';
 import StopsDisplay from '../components/StopsDisplay';
 
-mapboxgl.accessToken = process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN || '';
+mapboxgl.accessToken = process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN || 'pk.eyJ1IjoiemFjYm1yMjIiLCJhIjoiY2x5ZHRtZDJqMDVsNDJrb3VmZWZoMG9yciJ9.Vid6j50Ey1xMLT6n6g6AgQ';
 
 const CombinedPage: React.FC = () => {
   const [selectedArea, setSelectedArea] = useState<string | null>(null);
@@ -19,15 +19,12 @@ const CombinedPage: React.FC = () => {
   const mapContainer = useRef<HTMLDivElement | null>(null);
   const mapInstance = useRef<mapboxgl.Map | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
-  const [visibleColumn, setVisibleColumn] = useState<number>(0);
-
-  const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
 
   useEffect(() => {
     const fetchRegions = async () => {
       try {
-        const response = await fetch(`${API_BASE_URL}/region_data_app`);
+        const response = await fetch(`https://bus-app-api-kl95.onrender.com/region_data_app`);
         const data = await response.json();
         setRegions(data.data);
         setLoading(false);
@@ -59,7 +56,7 @@ const CombinedPage: React.FC = () => {
 
   const fetchTimetableData = async (region: string) => {
     try {
-      const response = await fetch(`${API_BASE_URL}/timetable_data_app/${region}`);
+      const response = await fetch(`https://bus-app-api-kl95.onrender.com/timetable_data_app/${region}`);
       const data = await response.json();
       setTimetableData({ [region]: data.routes });
     } catch (error) {

@@ -8,7 +8,7 @@ import StopsDisplay from '../components/StopsDisplay';
 
 mapboxgl.accessToken = process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN || 'pk.eyJ1IjoiemFjYm1yMjIiLCJhIjoiY2x5ZHRtZDJqMDVsNDJrb3VmZWZoMG9yciJ9.Vid6j50Ey1xMLT6n6g6AgQ';
 
-const CombinedPage: React.FC = () => {
+const Index: React.FC = () => {
   const [selectedArea, setSelectedArea] = useState<string | null>(null);
   const [selectedRoute, setSelectedRoute] = useState<any | null>(null);
   const [selectedService, setSelectedService] = useState<any | null>(null);
@@ -75,12 +75,12 @@ const CombinedPage: React.FC = () => {
     fetchTimetableData(area);
 
     // Fly to region on map
-    if (mapInstance.current && regions.find((r) => r.id === area)) {
-      const regionData = regions.find((r) => r.id === area);
-      const { lng, lat, zoom } = regionData;
+    const selectedRegion = regions.find((r) => r.id === area);
+    if (mapInstance.current && selectedRegion) {
+      const { long: lng, lat } = selectedRegion;
       mapInstance.current.flyTo({
         center: [lng || 170.5046, lat || -45.8788],
-        zoom: zoom || 12,
+        zoom: 12,
         essential: true,
       });
     }
@@ -129,21 +129,21 @@ const CombinedPage: React.FC = () => {
       {/* Map background */}
       <div
         ref={mapContainer}
-        className={`absolute top-0 left-0 w-full h-full transition-opacity duration-1000 ${mapLoaded ? 'opacity-100' : 'opacity-0'}`}
+        className={`absolute top-0 left-0 w-full h-full ${mapLoaded ? 'opacity-100' : 'opacity-0'} transition-opacity duration-1000`}
       />
-
+  
       <div className="relative z-10 flex flex-col justify-center items-center h-full">
-        {/* Hide header and container when on StopsDisplay (currentPage === 4) */}
+        {/* Only hide the white container and header when on StopsDisplay (currentPage === 4), but keep the map visible */}
         {currentPage !== 4 && (
           <div className="bg-white bg-opacity-90 p-6 rounded-lg shadow-lg max-w-4xl w-full">
             <h1 className="text-4xl font-bold text-black mb-6 text-center">Bus Timetable</h1>
-
+  
             {loading ? (
               <p>Loading regions...</p>
             ) : currentPage === 1 ? (
               <RegionSelector regions={regions} onAreaSelect={handleAreaSelect} />
             ) : null}
-
+  
             {currentPage === 2 && selectedArea && (
               <RouteSelector
                 selectedArea={selectedArea}
@@ -152,7 +152,7 @@ const CombinedPage: React.FC = () => {
                 onBack={goBack}
               />
             )}
-
+  
             {currentPage === 3 && selectedRoute && (
               <ServiceSelector
                 selectedRoute={selectedRoute}
@@ -165,7 +165,8 @@ const CombinedPage: React.FC = () => {
             )}
           </div>
         )}
-
+  
+        {/* Keep the map visible, but show StopsDisplay when on page 4 */}
         {currentPage === 4 && selectedService && (
           <StopsDisplay
             selectedService={selectedService}
@@ -176,7 +177,7 @@ const CombinedPage: React.FC = () => {
           />
         )}
       </div>
-
+  
       {/* Loading indicator for the map */}
       {!mapLoaded && (
         <div className="absolute top-0 left-0 w-full h-full flex items-center justify-center z-20 bg-white bg-opacity-80">
@@ -187,4 +188,4 @@ const CombinedPage: React.FC = () => {
   );
 };
 
-export default CombinedPage;
+export default Index;

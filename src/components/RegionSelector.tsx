@@ -25,7 +25,7 @@ const RegionSelector: React.FC<RegionSelectorProps> = ({ regions, onAreaSelect }
 
 
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 ">
         {regions.length > 0 ? (
           regions.map((region: any) => (
             <button

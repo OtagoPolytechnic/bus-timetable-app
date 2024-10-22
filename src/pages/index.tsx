@@ -6,6 +6,7 @@ import RouteSelector from '../components/RouteSelector';
 import ServiceSelector from '../components/ServiceSelector';
 import StopsDisplay from '../components/StopsDisplay';
 import Image from 'next/image';
+import logo from '/public/App.png';
 
 mapboxgl.accessToken = process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN || 'pk.eyJ1IjoiemFjYm1yMjIiLCJhIjoiY2x5ZHRtZDJqMDVsNDJrb3VmZWZoMG9yciJ9.Vid6j50Ey1xMLT6n6g6AgQ';
 
@@ -134,45 +135,26 @@ const Index: React.FC = () => {
       />
 
       <div className="relative z-10 flex flex-col justify-center items-center h-full">
-        {/* Optimized logo image */}
-        {currentPage === 1 && (
-          <div className="absolute top-16 mb-6">
-            <Image
-              src="/App.png" // Ensure the correct path to your PNG image
-              alt="App Logo"
-              width={220} // Adjust the width
-              height={240} // Adjust the height
-              className="opacity-80" // Add opacity to blend with background
-              priority // Ensures the image is loaded quickly
-            />
-          </div>
-        )}
+        <Image
+          src={logo} // Project Logo
+          alt="Logo"
+          width={350} 
+          height={350}
+          className="absolute top-4 left-1/2 transform -translate-x-1/2"
+          priority
+        />
 
-        {/* Welcome container */}
-        {currentPage === 1 && (
-          <div className="bg-white bg-opacity-90 p-6 rounded-lg shadow-lg max-w-4xl w-full text-center">
-            <h1 className="text-4xl font-bold text-black mb-6">Welcome to the Bus Timetable App</h1>
-            <button
-              className="bg-blue-500 text-white px-6 py-3 rounded-full shadow-md hover:bg-blue-600 transition-colors"
-              onClick={() => setCurrentPage(2)}
-            >
-              Continue
-            </button>
-          </div>
-        )}
-
-        {/* Other pages */}
-        {currentPage !== 4 && currentPage > 1 && (
+        {currentPage !== 4 && (
           <div className="bg-white bg-opacity-90 p-6 rounded-lg shadow-lg max-w-4xl w-full">
             <h1 className="text-4xl font-bold text-black mb-6 text-center">Bus Timetable</h1>
 
             {loading ? (
               <p>Loading regions...</p>
-            ) : currentPage === 2 ? (
+            ) : currentPage === 1 ? (
               <RegionSelector regions={regions} onAreaSelect={handleAreaSelect} />
             ) : null}
 
-            {currentPage === 3 && selectedArea && (
+            {currentPage === 2 && selectedArea && (
               <RouteSelector
                 selectedArea={selectedArea}
                 timetableData={timetableData}
@@ -181,12 +163,12 @@ const Index: React.FC = () => {
               />
             )}
 
-            {currentPage === 4 && selectedRoute && (
+            {currentPage === 3 && selectedRoute && (
               <ServiceSelector
                 selectedRoute={selectedRoute}
                 onServiceSelect={(service) => {
                   setSelectedService(service);
-                  setCurrentPage(5);
+                  setCurrentPage(4);
                 }}
                 onBack={goBack}
               />
@@ -194,7 +176,7 @@ const Index: React.FC = () => {
           </div>
         )}
 
-        {currentPage === 5 && selectedService && (
+        {currentPage === 4 && selectedService && (
           <StopsDisplay
             selectedService={selectedService}
             getCurrentDayTrips={getCurrentDayTrips}

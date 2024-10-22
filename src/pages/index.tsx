@@ -1,13 +1,15 @@
 import React, { useState, useEffect, useRef } from 'react';
 import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
+import Image from 'next/image'; // Ensure you have imported Image
 import RegionSelector from '../components/RegionSelector';
 import RouteSelector from '../components/RouteSelector';
 import ServiceSelector from '../components/ServiceSelector';
 import StopsDisplay from '../components/StopsDisplay';
- 
+import logo from '/public/App.png';
+
 mapboxgl.accessToken = process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN || 'pk.eyJ1IjoiemFjYm1yMjIiLCJhIjoiY2x5ZHRtZDJqMDVsNDJrb3VmZWZoMG9yciJ9.Vid6j50Ey1xMLT6n6g6AgQ';
- 
+
 const Index: React.FC = () => {
   const [selectedArea, setSelectedArea] = useState<string | null>(null);
   const [selectedRoute, setSelectedRoute] = useState<any | null>(null);
@@ -20,7 +22,7 @@ const Index: React.FC = () => {
   const mapInstance = useRef<mapboxgl.Map | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [welcomeScreenVisible, setWelcomeScreenVisible] = useState<boolean>(true); // New state for welcome screen
- 
+
   // Fetch regions on initial load
   useEffect(() => {
     const fetchRegions = async () => {
@@ -36,7 +38,7 @@ const Index: React.FC = () => {
     };
     fetchRegions();
   }, []);
- 
+
   // Initialize mapbox map
   useEffect(() => {
     if (mapContainer.current) {
@@ -46,16 +48,16 @@ const Index: React.FC = () => {
         center: [172.6362, -41.5000],
         zoom: 5,
       });
- 
+
       map.on('load', () => {
         setMapLoaded(true);
         mapInstance.current = map;
       });
- 
+
       return () => map.remove();
     }
   }, []);
- 
+
   // Fetch timetable data for the selected region
   const fetchTimetableData = async (region: string) => {
     try {
@@ -66,7 +68,7 @@ const Index: React.FC = () => {
       console.error('Error fetching timetable data:', error);
     }
   };
- 
+
   // Handle region selection
   const handleAreaSelect = (area: string) => {
     setSelectedArea(area);
@@ -74,7 +76,7 @@ const Index: React.FC = () => {
     setSelectedService(null);
     setCurrentPage(2);
     fetchTimetableData(area);
- 
+
     // Fly to region on map
     const selectedRegion = regions.find((r) => r.id === area);
     if (mapInstance.current && selectedRegion) {
@@ -86,20 +88,20 @@ const Index: React.FC = () => {
       });
     }
   };
- 
+
   // Handle route selection
   const handleRouteSelect = (route: any) => {
     setSelectedRoute(route);
     setCurrentPage(3);
   };
- 
+
   // Handle going back through pages
   const goBack = () => {
     if (currentPage > 1) {
       setCurrentPage(currentPage - 1);
     }
   };
- 
+
   // Get trips for the current day
   const getCurrentDayTrips = (service: any) => {
     const today = new Date().toLocaleString('en-US', { weekday: 'short' }).toUpperCase();
@@ -107,24 +109,24 @@ const Index: React.FC = () => {
       trip.days.some((day: any) => day.day === today)
     );
   };
- 
+
   // Get stops for the current service version
   const getStopsForCurrentServiceVersion = (service: any, serviceVersion: number) => {
     const versionData = service.service_versions.find((version: any) => version.version === serviceVersion);
     return versionData ? versionData.stops : [];
   };
- 
+
   // Calculate stop times
   const calculateStopTime = (startTime: string, increment: number) => {
     const [hours, minutes] = startTime.split(':').map(Number);
     const tripStartTime = new Date();
     tripStartTime.setHours(hours);
     tripStartTime.setMinutes(minutes);
- 
+
     const stopTime = new Date(tripStartTime.getTime() + increment * 60000);
     return stopTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true });
   };
- 
+
   return (
     <div className="relative h-screen w-screen">
       {/* Map background */}
@@ -132,8 +134,17 @@ const Index: React.FC = () => {
         ref={mapContainer}
         className={`absolute top-0 left-0 w-full h-full ${mapLoaded ? 'opacity-100' : 'opacity-0'} transition-opacity duration-1000`}
       />
- 
-      <div className="relative z-10 flex flex-col justify-center items-center h-full">
+
+<div className="relative z-10 flex flex-col justify-center items-center h-full">
+        <Image
+          src={logo} // Project Logo
+          alt="Logo"
+          width={350} 
+          height={350}
+          className="absolute top-4 left-1/2 transform -translate-x-1/2"
+          priority
+        />
+
 
         {/* Show welcome screen before region selection */}
         {welcomeScreenVisible ? (
@@ -153,13 +164,13 @@ const Index: React.FC = () => {
             {currentPage !== 4 && (
               <div className="bg-white bg-opacity-90 p-6 rounded-lg shadow-lg max-w-4xl w-full">
                 <h1 className="text-4xl font-bold text-black mb-6 text-center">Bus Timetable</h1>
- 
+
                 {loading ? (
                   <p>Loading regions...</p>
                 ) : currentPage === 1 ? (
                   <RegionSelector regions={regions} onAreaSelect={handleAreaSelect} />
                 ) : null}
- 
+
                 {currentPage === 2 && selectedArea && (
                   <RouteSelector
                     selectedArea={selectedArea}
@@ -168,7 +179,7 @@ const Index: React.FC = () => {
                     onBack={goBack}
                   />
                 )}
- 
+
                 {currentPage === 3 && selectedRoute && (
                   <ServiceSelector
                     selectedRoute={selectedRoute}
@@ -181,7 +192,7 @@ const Index: React.FC = () => {
                 )}
               </div>
             )}
- 
+
             {/* Keep the map visible, but show StopsDisplay when on page 4 */}
             {currentPage === 4 && selectedService && (
               <StopsDisplay
@@ -195,16 +206,15 @@ const Index: React.FC = () => {
           </>
         )}
 
+        {/* Loading indicator for the map */}
+        {!mapLoaded && (
+          <div className="absolute top-0 left-0 w-full h-full flex items-center justify-center z-20 bg-white bg-opacity-80">
+            <div className="text-2xl text-gray-700">Loading Map...</div>
+          </div>
+        )}
       </div>
- 
-      {/* Loading indicator for the map */}
-      {!mapLoaded && (
-        <div className="absolute top-0 left-0 w-full h-full flex items-center justify-center z-20 bg-white bg-opacity-80">
-          <div className="text-2xl text-gray-700">Loading Map...</div>
-        </div>
-      )}
     </div>
   );
 };
- 
+
 export default Index;

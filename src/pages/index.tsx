@@ -5,6 +5,7 @@ import RegionSelector from '../components/RegionSelector';
 import RouteSelector from '../components/RouteSelector';
 import ServiceSelector from '../components/ServiceSelector';
 import StopsDisplay from '../components/StopsDisplay';
+import Image from 'next/image';
 
 mapboxgl.accessToken = process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN || 'pk.eyJ1IjoiemFjYm1yMjIiLCJhIjoiY2x5ZHRtZDJqMDVsNDJrb3VmZWZoMG9yciJ9.Vid6j50Ey1xMLT6n6g6AgQ';
 
@@ -131,20 +132,47 @@ const Index: React.FC = () => {
         ref={mapContainer}
         className={`absolute top-0 left-0 w-full h-full ${mapLoaded ? 'opacity-100' : 'opacity-0'} transition-opacity duration-1000`}
       />
-  
+
       <div className="relative z-10 flex flex-col justify-center items-center h-full">
-        {/* Only hide the white container and header when on StopsDisplay (currentPage === 4), but keep the map visible */}
-        {currentPage !== 4 && (
+        {/* Optimized logo image */}
+        {currentPage === 1 && (
+          <div className="absolute top-16 mb-6">
+            <Image
+              src="/App.png" // Ensure the correct path to your PNG image
+              alt="App Logo"
+              width={220} // Adjust the width
+              height={240} // Adjust the height
+              className="opacity-80" // Add opacity to blend with background
+              priority // Ensures the image is loaded quickly
+            />
+          </div>
+        )}
+
+        {/* Welcome container */}
+        {currentPage === 1 && (
+          <div className="bg-white bg-opacity-90 p-6 rounded-lg shadow-lg max-w-4xl w-full text-center">
+            <h1 className="text-4xl font-bold text-black mb-6">Welcome to the Bus Timetable App</h1>
+            <button
+              className="bg-blue-500 text-white px-6 py-3 rounded-full shadow-md hover:bg-blue-600 transition-colors"
+              onClick={() => setCurrentPage(2)}
+            >
+              Continue
+            </button>
+          </div>
+        )}
+
+        {/* Other pages */}
+        {currentPage !== 4 && currentPage > 1 && (
           <div className="bg-white bg-opacity-90 p-6 rounded-lg shadow-lg max-w-4xl w-full">
             <h1 className="text-4xl font-bold text-black mb-6 text-center">Bus Timetable</h1>
-  
+
             {loading ? (
               <p>Loading regions...</p>
-            ) : currentPage === 1 ? (
+            ) : currentPage === 2 ? (
               <RegionSelector regions={regions} onAreaSelect={handleAreaSelect} />
             ) : null}
-  
-            {currentPage === 2 && selectedArea && (
+
+            {currentPage === 3 && selectedArea && (
               <RouteSelector
                 selectedArea={selectedArea}
                 timetableData={timetableData}
@@ -152,22 +180,21 @@ const Index: React.FC = () => {
                 onBack={goBack}
               />
             )}
-  
-            {currentPage === 3 && selectedRoute && (
+
+            {currentPage === 4 && selectedRoute && (
               <ServiceSelector
                 selectedRoute={selectedRoute}
                 onServiceSelect={(service) => {
                   setSelectedService(service);
-                  setCurrentPage(4);
+                  setCurrentPage(5);
                 }}
                 onBack={goBack}
               />
             )}
           </div>
         )}
-  
-        {/* Keep the map visible, but show StopsDisplay when on page 4 */}
-        {currentPage === 4 && selectedService && (
+
+        {currentPage === 5 && selectedService && (
           <StopsDisplay
             selectedService={selectedService}
             getCurrentDayTrips={getCurrentDayTrips}
@@ -177,8 +204,7 @@ const Index: React.FC = () => {
           />
         )}
       </div>
-  
-      {/* Loading indicator for the map */}
+
       {!mapLoaded && (
         <div className="absolute top-0 left-0 w-full h-full flex items-center justify-center z-20 bg-white bg-opacity-80">
           <div className="text-2xl text-gray-700">Loading Map...</div>

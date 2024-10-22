@@ -1,11 +1,11 @@
 import React, { useState, useEffect, useRef } from 'react';
 import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
+import Image from 'next/image'; // Ensure you have imported Image
 import RegionSelector from '../components/RegionSelector';
 import RouteSelector from '../components/RouteSelector';
 import ServiceSelector from '../components/ServiceSelector';
 import StopsDisplay from '../components/StopsDisplay';
-import Image from 'next/image';
 import logo from '/public/App.png';
 
 mapboxgl.accessToken = process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN || 'pk.eyJ1IjoiemFjYm1yMjIiLCJhIjoiY2x5ZHRtZDJqMDVsNDJrb3VmZWZoMG9yciJ9.Vid6j50Ey1xMLT6n6g6AgQ';
@@ -21,6 +21,7 @@ const Index: React.FC = () => {
   const mapContainer = useRef<HTMLDivElement | null>(null);
   const mapInstance = useRef<mapboxgl.Map | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
+  const [welcomeScreenVisible, setWelcomeScreenVisible] = useState<boolean>(true); // New state for welcome screen
 
   // Fetch regions on initial load
   useEffect(() => {
@@ -134,7 +135,7 @@ const Index: React.FC = () => {
         className={`absolute top-0 left-0 w-full h-full ${mapLoaded ? 'opacity-100' : 'opacity-0'} transition-opacity duration-1000`}
       />
 
-      <div className="relative z-10 flex flex-col justify-center items-center h-full">
+<div className="relative z-10 flex flex-col justify-center items-center h-full">
         <Image
           src={logo} // Project Logo
           alt="Logo"
@@ -144,54 +145,74 @@ const Index: React.FC = () => {
           priority
         />
 
-        {currentPage !== 4 && (
-          <div className="bg-white bg-opacity-90 p-6 rounded-lg shadow-lg max-w-4xl w-full">
-            <h1 className="text-4xl font-bold text-black mb-6 text-center">Bus Timetable</h1>
 
-            {loading ? (
-              <p>Loading regions...</p>
-            ) : currentPage === 1 ? (
-              <RegionSelector regions={regions} onAreaSelect={handleAreaSelect} />
-            ) : null}
+        {/* Show welcome screen before region selection */}
+        {welcomeScreenVisible ? (
+          <div className="bg-white bg-opacity-90 p-8 rounded-lg shadow-lg max-w-xl w-full text-center">
+            <h1 className="text-4xl font-bold text-black mb-6">Welcome to the Bus Timetable App</h1>
+            <p className="text-xl text-gray-700 mb-6">Plan your bus trips with ease. Select a region to get started.</p>
+            <button
+              onClick={() => setWelcomeScreenVisible(false)}
+              className="bg-blue-500 text-white px-6 py-3 rounded-lg hover:bg-blue-600 transition duration-300"
+            >
+              Continue
+            </button>
+          </div>
+        ) : (
+          <>
+            {/* Only hide the white container and header when on StopsDisplay (currentPage === 4), but keep the map visible */}
+            {currentPage !== 4 && (
+              <div className="bg-white bg-opacity-90 p-6 rounded-lg shadow-lg max-w-4xl w-full">
+                <h1 className="text-4xl font-bold text-black mb-6 text-center">Bus Timetable</h1>
 
-            {currentPage === 2 && selectedArea && (
-              <RouteSelector
-                selectedArea={selectedArea}
-                timetableData={timetableData}
-                onRouteSelect={handleRouteSelect}
+                {loading ? (
+                  <p>Loading regions...</p>
+                ) : currentPage === 1 ? (
+                  <RegionSelector regions={regions} onAreaSelect={handleAreaSelect} />
+                ) : null}
+
+                {currentPage === 2 && selectedArea && (
+                  <RouteSelector
+                    selectedArea={selectedArea}
+                    timetableData={timetableData}
+                    onRouteSelect={handleRouteSelect}
+                    onBack={goBack}
+                  />
+                )}
+
+                {currentPage === 3 && selectedRoute && (
+                  <ServiceSelector
+                    selectedRoute={selectedRoute}
+                    onServiceSelect={(service) => {
+                      setSelectedService(service);
+                      setCurrentPage(4);
+                    }}
+                    onBack={goBack}
+                  />
+                )}
+              </div>
+            )}
+
+            {/* Keep the map visible, but show StopsDisplay when on page 4 */}
+            {currentPage === 4 && selectedService && (
+              <StopsDisplay
+                selectedService={selectedService}
+                getCurrentDayTrips={getCurrentDayTrips}
+                getStopsForCurrentServiceVersion={getStopsForCurrentServiceVersion}
+                calculateStopTime={calculateStopTime}
                 onBack={goBack}
               />
             )}
+          </>
+        )}
 
-            {currentPage === 3 && selectedRoute && (
-              <ServiceSelector
-                selectedRoute={selectedRoute}
-                onServiceSelect={(service) => {
-                  setSelectedService(service);
-                  setCurrentPage(4);
-                }}
-                onBack={goBack}
-              />
-            )}
+        {/* Loading indicator for the map */}
+        {!mapLoaded && (
+          <div className="absolute top-0 left-0 w-full h-full flex items-center justify-center z-20 bg-white bg-opacity-80">
+            <div className="text-2xl text-gray-700">Loading Map...</div>
           </div>
         )}
-
-        {currentPage === 4 && selectedService && (
-          <StopsDisplay
-            selectedService={selectedService}
-            getCurrentDayTrips={getCurrentDayTrips}
-            getStopsForCurrentServiceVersion={getStopsForCurrentServiceVersion}
-            calculateStopTime={calculateStopTime}
-            onBack={goBack}
-          />
-        )}
       </div>
-
-      {!mapLoaded && (
-        <div className="absolute top-0 left-0 w-full h-full flex items-center justify-center z-20 bg-white bg-opacity-80">
-          <div className="text-2xl text-gray-700">Loading Map...</div>
-        </div>
-      )}
     </div>
   );
 };

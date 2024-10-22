@@ -134,6 +134,7 @@ const Index: React.FC = () => {
       />
  
       <div className="relative z-10 flex flex-col justify-center items-center h-full">
+
         {/* Show welcome screen before region selection */}
         {welcomeScreenVisible ? (
           <div className="bg-white bg-opacity-90 p-8 rounded-lg shadow-lg max-w-xl w-full text-center">
@@ -193,6 +194,7 @@ const Index: React.FC = () => {
             )}
           </>
         )}
+
       </div>
  
       {/* Loading indicator for the map */}

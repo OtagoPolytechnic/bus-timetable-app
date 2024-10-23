@@ -15,42 +15,65 @@ const StopsDisplay: React.FC<StopsDisplayProps> = ({
   calculateStopTime,
   onBack,
 }) => {
-  const [visibleColumn, setVisibleColumn] = useState<number>(0);
+  const [currentPage, setCurrentPage] = useState<number>(0);
+  const stopsPerPage = 8; 
 
-  const handleNextColumn = () => {
-    setVisibleColumn((prevColumn) => prevColumn + 1);
-  };
+  const trips = getCurrentDayTrips(selectedService);
+  const stops: any[] = []; // Initialize an array to hold stops
+  const tripTimes: { [key: string]: string } = {}; 
 
-  const handlePrevColumn = () => {
-    if (visibleColumn > 0) {
-      setVisibleColumn((prevColumn) => prevColumn - 1);
+  // stops for each trip and their corresponding times
+  trips.forEach((trip: any) => {
+    const tripStops = getStopsForCurrentServiceVersion(selectedService, trip.service_version);
+    
+    // Store the start time for the trip
+    const tripStartTime = trip.start_time;
+
+    tripStops.forEach((stop: any, index: number) => {
+      const stopTime = calculateStopTime(tripStartTime, stop.increment); // Calculate stop time
+      stops.push({ ...stop, time: stopTime }); // Push stop with calculated time
+    });
+  });
+
+  // Calculate the number of pages
+  const totalPages = Math.ceil(stops.length / stopsPerPage);
+  
+  // Get stops for the current page
+  const currentStops = stops.slice(currentPage * stopsPerPage, (currentPage + 1) * stopsPerPage);
+
+  const handleNextPage = () => {
+    if (currentPage < totalPages - 1) {
+      setCurrentPage((prevPage) => prevPage + 1);
     }
   };
 
-  const trips = getCurrentDayTrips(selectedService);
+  const handlePrevPage = () => {
+    if (currentPage > 0) {
+      setCurrentPage((prevPage) => prevPage - 1);
+    }
+  };
 
   return (
-    <div
-      className="absolute top-8 left-8 bg-white p-6 rounded-lg shadow-lg w-96"
-      style={{ zIndex: 20 }}
-    >
+    <div className="absolute top-8 left-8 bg-white p-6 rounded-lg shadow-lg w-96" style={{ zIndex: 20 }}>
       <h2 className="text-2xl font-semibold mb-4 text-center">
         Stops for {selectedService.code}
       </h2>
 
+      {/* Pagination Controls */}
       <div className="flex justify-between items-center mb-4">
         <button
           className="px-4 py-2 bg-blue-500 text-white font-bold rounded-lg shadow-lg"
-          onClick={handlePrevColumn}
-          disabled={visibleColumn === 0}
+          onClick={handlePrevPage}
+          disabled={currentPage === 0}
         >
-          &lt;
+          &lt; Previous
         </button>
         <button
           className="px-4 py-2 bg-blue-500 text-white font-bold rounded-lg shadow-lg"
-          onClick={handleNextColumn}
+          onClick={handleNextPage}
+          disabled={currentPage === totalPages - 1}
         >
-          &gt;
+          Next &gt;
         </button>
       </div>
 
@@ -62,17 +85,12 @@ const StopsDisplay: React.FC<StopsDisplayProps> = ({
           </tr>
         </thead>
         <tbody className="bg-white divide-y divide-gray-200">
-          {trips.map((trip: any, index: number) => {
-            const stops = getStopsForCurrentServiceVersion(selectedService, trip.service_version);
-            return stops.map((stop: any, stopIndex: number) => (
-              <tr key={`${index}-${stopIndex}`}>
-                <td className="px-6 py-4 text-sm text-gray-700">{stop.address}</td>
-                <td className="px-6 py-4 text-sm text-gray-700">
-                  {calculateStopTime(trip.start_time, stop.increment + visibleColumn * 30)}
-                </td>
-              </tr>
-            ));
-          })}
+          {currentStops.map((stop: any, stopIndex: number) => (
+            <tr key={stopIndex}>
+              <td className="px-6 py-4 text-sm text-gray-700">{stop.address}</td>
+              <td className="px-6 py-4 text-sm text-gray-700">{stop.time}</td>
+            </tr>
+          ))}
         </tbody>
       </table>
 

@@ -16,12 +16,11 @@ const Index: React.FC = () => {
   const [selectedService, setSelectedService] = useState<any | null>(null);
   const [timetableData, setTimetableData] = useState<any>({});
   const [regions, setRegions] = useState<any[]>([]);
-  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [currentPage, setCurrentPage] = useState<number>(0); 
   const [mapLoaded, setMapLoaded] = useState(false);
   const mapContainer = useRef<HTMLDivElement | null>(null);
   const mapInstance = useRef<mapboxgl.Map | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
-  const [welcomeScreenVisible, setWelcomeScreenVisible] = useState<boolean>(true); // New state for welcome screen
 
   // Fetch regions on initial load
   useEffect(() => {
@@ -71,11 +70,12 @@ const Index: React.FC = () => {
 
   // Handle region selection
   const handleAreaSelect = (area: string) => {
-    setSelectedArea(area);
-    setSelectedRoute(null);
-    setSelectedService(null);
-    setCurrentPage(2);
-    fetchTimetableData(area);
+    console.log("Selected area:", area);
+  setSelectedArea(area);
+  setSelectedRoute(null);
+  setSelectedService(null);
+  setCurrentPage(2);
+  fetchTimetableData(area);
 
     // Fly to region on map
     const selectedRegion = regions.find((r) => r.id === area);
@@ -92,13 +92,13 @@ const Index: React.FC = () => {
   // Handle route selection
   const handleRouteSelect = (route: any) => {
     setSelectedRoute(route);
-    setCurrentPage(3);
+    setCurrentPage(3); 
   };
 
   // Handle going back through pages
   const goBack = () => {
-    if (currentPage > 1) {
-      setCurrentPage(currentPage - 1);
+    if (currentPage > 0) {
+      setCurrentPage(currentPage - 1); 
     }
   };
 
@@ -135,24 +135,23 @@ const Index: React.FC = () => {
         className={`absolute top-0 left-0 w-full h-full ${mapLoaded ? 'opacity-100' : 'opacity-0'} transition-opacity duration-1000`}
       />
 
-<div className="relative z-10 flex flex-col justify-center items-center h-full">
+      <div className="relative z-10 flex flex-col justify-center items-center h-full">
         <Image
           src={logo} // Project Logo
           alt="Logo"
-          width={350} 
+          width={350}
           height={350}
           className="absolute top-4 left-1/2 transform -translate-x-1/2"
           priority
         />
 
-
-        {/* Show welcome screen before region selection */}
-        {welcomeScreenVisible ? (
+        {/* Show welcome screen for page 0 */}
+        {currentPage === 0 ? (
           <div className="bg-white bg-opacity-90 p-8 rounded-lg shadow-lg max-w-xl w-full text-center">
             <h1 className="text-4xl font-bold text-black mb-6">Welcome to the Bus Timetable App</h1>
             <p className="text-xl text-gray-700 mb-6">Plan your bus trips with ease. Select a region to get started.</p>
             <button
-              onClick={() => setWelcomeScreenVisible(false)}
+              onClick={() => setCurrentPage(1)}
               className="bg-blue-500 text-white px-6 py-3 rounded-lg hover:bg-blue-600 transition duration-300"
             >
               Continue
@@ -168,7 +167,7 @@ const Index: React.FC = () => {
                 {loading ? (
                   <p>Loading regions...</p>
                 ) : currentPage === 1 ? (
-                  <RegionSelector regions={regions} onAreaSelect={handleAreaSelect} />
+                  <RegionSelector regions={regions} onAreaSelect={handleAreaSelect} onBack={goBack} />
                 ) : null}
 
                 {currentPage === 2 && selectedArea && (
@@ -208,8 +207,8 @@ const Index: React.FC = () => {
 
         {/* Loading indicator for the map */}
         {!mapLoaded && (
-          <div className="absolute top-0 left-0 w-full h-full flex items-center justify-center z-20 bg-white bg-opacity-80">
-            <div className="text-2xl text-gray-700">Loading Map...</div>
+          <div className="absolute top-0 left-0 w-full h-full flex items-center justify-center z-20 bg-white bg-opacity-90">
+            <p>Loading map...</p>
           </div>
         )}
       </div>

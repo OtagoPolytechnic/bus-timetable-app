@@ -16,20 +16,17 @@ const StopsDisplay: React.FC<StopsDisplayProps> = ({
   onBack,
 }) => {
   const [currentPage, setCurrentPage] = useState<number>(0);
-  const stopsPerPage = 8; 
+  const stopsPerPage = 8;
 
   const trips = getCurrentDayTrips(selectedService);
   const stops: any[] = []; // Initialize an array to hold stops
-  const tripTimes: { [key: string]: string } = {}; 
 
   // stops for each trip and their corresponding times
   trips.forEach((trip: any) => {
     const tripStops = getStopsForCurrentServiceVersion(selectedService, trip.service_version);
-    
-    // Store the start time for the trip
     const tripStartTime = trip.start_time;
 
-    tripStops.forEach((stop: any, index: number) => {
+    tripStops.forEach((stop: any) => {
       const stopTime = calculateStopTime(tripStartTime, stop.increment); // Calculate stop time
       stops.push({ ...stop, time: stopTime }); // Push stop with calculated time
     });
@@ -62,14 +59,14 @@ const StopsDisplay: React.FC<StopsDisplayProps> = ({
       {/* Pagination Controls */}
       <div className="flex justify-between items-center mb-4">
         <button
-          className="px-4 py-2 bg-blue-500 text-white font-bold rounded-lg shadow-lg"
+          className={`px-4 py-2 font-bold rounded-lg shadow-lg ${currentPage === 0 ? 'bg-gray-300 text-gray-500 cursor-not-allowed opacity-70' : 'bg-blue-500 text-white'}`}
           onClick={handlePrevPage}
           disabled={currentPage === 0}
         >
           &lt; Previous
         </button>
         <button
-          className="px-4 py-2 bg-blue-500 text-white font-bold rounded-lg shadow-lg"
+          className={`px-4 py-2 font-bold rounded-lg shadow-lg ${currentPage === totalPages - 1 ? 'bg-gray-300 text-gray-500 cursor-not-allowed opacity-70' : 'bg-blue-500 text-white'}`}
           onClick={handleNextPage}
           disabled={currentPage === totalPages - 1}
         >

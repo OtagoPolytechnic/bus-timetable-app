@@ -8,7 +8,7 @@ interface ServiceSelectorProps {
 
 const ServiceSelector: React.FC<ServiceSelectorProps> = ({ selectedRoute, onServiceSelect, onBack }) => {
   return (
-    <div className="flex flex-col items-center p-6 bg-white rounded-lg w-full max-w-md mx-auto"> {/* Removed shadow-md */}
+    <div className="flex flex-col items-center p-6 bg-white rounded-lg w-full max-w-md mx-auto">
       <h2 className="text-2xl font-semibold mb-4">Services for Route {selectedRoute.title}</h2>
       <div className="grid grid-cols-1 gap-6 w-full">
         {selectedRoute.services && selectedRoute.services.length > 0 ? (

@@ -147,17 +147,17 @@ const Index: React.FC = () => {
 
         {/* Show welcome screen for page 0 */}
         {currentPage === 0 ? (
-          <div className="bg-white bg-opacity-90 p-8 rounded-lg shadow-lg max-w-xl w-full text-center">
-            <h1 className="text-4xl font-bold text-black mb-6">Welcome to the Bus Timetable App</h1>
-            <p className="text-xl text-gray-700 mb-6">Plan your bus trips with ease. Select a region to get started.</p>
-            <button
-              onClick={() => setCurrentPage(1)}
-              className="bg-blue-500 text-white px-6 py-3 rounded-lg hover:bg-blue-600 transition duration-300"
-            >
-              Continue
-            </button>
-          </div>
-        ) : (
+  <div className="bg-white bg-opacity-90 p-8 rounded-lg shadow-lg max-w-xl w-full text-center border border-black">
+    <h1 className="text-4xl font-bold text-black mb-6">Welcome to the Bus Timetable App</h1>
+    <p className="text-xl text-gray-700 mb-6">Plan your bus trips with ease. Select a region to get started.</p>
+    <button
+      onClick={() => setCurrentPage(1)}
+      className="bg-blue-500 text-white px-6 py-3 rounded-lg hover:bg-blue-600 transition duration-300"
+    >
+      Continue
+    </button>
+  </div>
+) : (
           <>
             {/* Only hide the white container and header when on StopsDisplay (currentPage === 4), but keep the map visible */}
             {currentPage !== 4 && (

@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
-import Image from 'next/image'; // Ensure you have imported Image
+import Image from 'next/image';
 import RegionSelector from '../components/RegionSelector';
 import RouteSelector from '../components/RouteSelector';
 import ServiceSelector from '../components/ServiceSelector';
@@ -18,9 +18,11 @@ const Index: React.FC = () => {
   const [regions, setRegions] = useState<any[]>([]);
   const [currentPage, setCurrentPage] = useState<number>(0);
   const [mapLoaded, setMapLoaded] = useState(false);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [isLoadingStops, setIsLoadingStops] = useState<boolean>(false); // New loading state for stops display
+
   const mapContainer = useRef<HTMLDivElement | null>(null);
   const mapInstance = useRef<mapboxgl.Map | null>(null);
-  const [loading, setLoading] = useState<boolean>(true);
 
   // Fetch regions on initial load
   useEffect(() => {
@@ -90,9 +92,19 @@ const Index: React.FC = () => {
   };
 
   // Handle route selection
-  const handleRouteSelect = (route: any) => {
+  const handleRouteSelect = async (route: any) => {
     setSelectedRoute(route);
     setCurrentPage(3);
+  };
+
+  // Handle service selection
+  const handleServiceSelect = async (service: any) => {
+    setIsLoadingStops(true); // Start loading animation
+    // Simulate a loading delay (e.g., fetching data)
+    await new Promise(resolve => setTimeout(resolve, 1000)); 
+    setSelectedService(service);
+    setCurrentPage(4);
+    setIsLoadingStops(false); // End loading animation
   };
 
   // Handle going back through pages
@@ -134,7 +146,6 @@ const Index: React.FC = () => {
         ref={mapContainer}
         className={`absolute top-0 left-0 w-full h-full ${mapLoaded ? 'opacity-100' : 'opacity-0'} transition-opacity duration-1000`}
       />
-  
       <div className="relative z-10 flex flex-col justify-center items-center h-full">
         <Image
           src={logo} // Project Logo
@@ -144,82 +155,79 @@ const Index: React.FC = () => {
           className="absolute top-4 left-1/2 transform -translate-x-1/2"
           priority
         />
-  
+
         {/* Show welcome screen for page 0 */}
- {currentPage === 0 ? (
-    <div className="bg-white bg-opacity-90 p-12 rounded-lg shadow-lg max-w-2xl w-full text-center border border-black mx-4">
-      <h1 className="text-4xl font-bold text-black mb-6">Welcome to the Otago Regional Bus App</h1>
-      <p className="text-xl text-gray-700 mb-6">
-        Plan your bus trips with ease. Select a region to get started.
-      </p>
-      <button
-        onClick={() => setCurrentPage(1)}
-        className="bg-blue-500 text-white px-8 py-4 rounded-lg hover:bg-blue-600 transition duration-300 text-lg"
-      >
-        Continue
-      </button>
-    </div>
-  ) : (
-    <>
-      {/* Only hide the white container and header when on StopsDisplay (currentPage === 4), but keep the map visible */}
-      {currentPage !== 4 && (
-        <div className="bg-white bg-opacity-90 p-6 rounded-lg shadow-lg max-w-4xl w-full border border-black relative">
-          <h1 className="text-4xl font-bold text-black text-center mb-6">Bus Timetable</h1> {/* Centered title */}
-          <button
-            onClick={goBack}
-            className="absolute top-4 right-4 bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition duration-300"
-          >
-            Back
-          </button>
+        {currentPage === 0 ? (
+          <div className="bg-white bg-opacity-90 p-12 rounded-lg shadow-lg max-w-2xl w-full text-center border border-black mx-4">
+            <h1 className="text-4xl font-bold text-black mb-6">Welcome to the Otago Regional Bus App</h1>
+            <p className="text-xl text-gray-700 mb-6">
+              Plan your bus trips with ease. Select a region to get started.
+            </p>
+            <button
+              onClick={() => setCurrentPage(1)}
+              className="bg-blue-500 text-white px-8 py-4 rounded-lg hover:bg-blue-600 transition duration-300 text-lg"
+            >
+              Continue
+            </button>
+          </div>
+        ) : (
+          <>
+            {/* Only hide the white container and header when on StopsDisplay (currentPage === 4), but keep the map visible */}
+            {currentPage !== 4 && (
+              <div className="bg-white bg-opacity-90 p-6 rounded-lg shadow-lg max-w-4xl w-full border border-black relative">
+                <h1 className="text-4xl font-bold text-black text-center mb-6">Bus Timetable</h1> {/* Centered title */}
+                <button
+                  onClick={goBack}
+                  className="absolute top-4 right-4 bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition duration-300"
+                >
+                  Back
+                </button>
 
-          {loading ? (
-            <p>Loading regions...</p>
-          ) : currentPage === 1 ? (
-            <RegionSelector regions={regions} onAreaSelect={handleAreaSelect} onBack={goBack} />
-          ) : null}
+                {loading ? (
+                  <p>Loading regions...</p>
+                ) : currentPage === 1 ? (
+                  <RegionSelector regions={regions} onAreaSelect={handleAreaSelect} onBack={goBack} />
+                ) : null}
 
-          {currentPage === 2 && selectedArea && (
-            <RouteSelector
-              selectedArea={selectedArea}
-              timetableData={timetableData}
-              onRouteSelect={handleRouteSelect}
-              onBack={goBack}
-            />
-          )}
+                {currentPage === 2 && selectedArea && (
+                  <RouteSelector
+                    selectedArea={selectedArea}
+                    timetableData={timetableData}
+                    onRouteSelect={handleRouteSelect}
+                    onBack={goBack}
+                  />
+                )}
 
-          {currentPage === 3 && selectedRoute && (
-            <ServiceSelector
-              selectedRoute={selectedRoute}
-              onServiceSelect={(service) => {
-                setSelectedService(service);
-                setCurrentPage(4);
-              }}
-              onBack={goBack}
-            />
-          )}
-        </div>
-      )}
+                {currentPage === 3 && selectedRoute && (
+                  <ServiceSelector
+                    selectedRoute={selectedRoute}
+                    onServiceSelect={handleServiceSelect}
+                    onBack={goBack}
+                  />
+                )}
+              </div>
+            )}
 
-      {/* Keep the map visible, but show StopsDisplay when on page 4 */}
-      {currentPage === 4 && selectedService && (
-        <StopsDisplay
-          selectedService={selectedService}
-          getCurrentDayTrips={getCurrentDayTrips}
-          getStopsForCurrentServiceVersion={getStopsForCurrentServiceVersion}
-          calculateStopTime={calculateStopTime}
-          onBack={goBack}
-        />
-      )}
-    </>
-  )}
+            {/* Keep the map visible, but show StopsDisplay when ready */}
+            {currentPage === 4 && (
+              <StopsDisplay
+                selectedService={selectedService}
+                getCurrentDayTrips={getCurrentDayTrips}
+                getStopsForCurrentServiceVersion={getStopsForCurrentServiceVersion}
+                calculateStopTime={calculateStopTime}
+                onBack={goBack}
+              />
+            )}
+          </>
+        )}
 
-  {/* Loading indicator for the map */}
-  {!mapLoaded && (
-    <div className="absolute top-0 left-0 w-full h-full flex items-center justify-center z-20 bg-white bg-opacity-80">
-      <p>Loading map...</p>
-    </div>
-  )}
-</div>
+        {/* Show loading animation when loading stops display */}
+        {isLoadingStops && (
+          <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-20">
+            <div className="loader"></div> 
+          </div>
+        )}
+      </div>
     </div>
   );
 };

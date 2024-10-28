@@ -148,7 +148,7 @@ const Index: React.FC = () => {
         {/* Show welcome screen for page 0 */}
         {currentPage === 0 ? (
           <div className="bg-white bg-opacity-90 p-8 rounded-lg shadow-lg max-w-xl w-full text-center border border-black">
-            <h1 className="text-4xl font-bold text-black mb-6">Welcome to the Bus Timetable App</h1>
+            <h1 className="text-4xl font-bold text-black mb-6">Welcome to the Otago Regional Bus App</h1>
             <p className="text-xl text-gray-700 mb-6">Plan your bus trips with ease. Select a region to get started.</p>
             <button
               onClick={() => setCurrentPage(1)}

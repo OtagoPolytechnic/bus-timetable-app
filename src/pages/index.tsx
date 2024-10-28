@@ -16,7 +16,7 @@ const Index: React.FC = () => {
   const [selectedService, setSelectedService] = useState<any | null>(null);
   const [timetableData, setTimetableData] = useState<any>({});
   const [regions, setRegions] = useState<any[]>([]);
-  const [currentPage, setCurrentPage] = useState<number>(0); 
+  const [currentPage, setCurrentPage] = useState<number>(0);
   const [mapLoaded, setMapLoaded] = useState(false);
   const mapContainer = useRef<HTMLDivElement | null>(null);
   const mapInstance = useRef<mapboxgl.Map | null>(null);
@@ -71,11 +71,11 @@ const Index: React.FC = () => {
   // Handle region selection
   const handleAreaSelect = (area: string) => {
     console.log("Selected area:", area);
-  setSelectedArea(area);
-  setSelectedRoute(null);
-  setSelectedService(null);
-  setCurrentPage(2);
-  fetchTimetableData(area);
+    setSelectedArea(area);
+    setSelectedRoute(null);
+    setSelectedService(null);
+    setCurrentPage(2);
+    fetchTimetableData(area);
 
     // Fly to region on map
     const selectedRegion = regions.find((r) => r.id === area);
@@ -92,13 +92,13 @@ const Index: React.FC = () => {
   // Handle route selection
   const handleRouteSelect = (route: any) => {
     setSelectedRoute(route);
-    setCurrentPage(3); 
+    setCurrentPage(3);
   };
 
   // Handle going back through pages
   const goBack = () => {
     if (currentPage > 0) {
-      setCurrentPage(currentPage - 1); 
+      setCurrentPage(currentPage - 1);
     }
   };
 
@@ -147,21 +147,21 @@ const Index: React.FC = () => {
 
         {/* Show welcome screen for page 0 */}
         {currentPage === 0 ? (
-  <div className="bg-white bg-opacity-90 p-8 rounded-lg shadow-lg max-w-xl w-full text-center border border-black">
-    <h1 className="text-4xl font-bold text-black mb-6">Welcome to the Bus Timetable App</h1>
-    <p className="text-xl text-gray-700 mb-6">Plan your bus trips with ease. Select a region to get started.</p>
-    <button
-      onClick={() => setCurrentPage(1)}
-      className="bg-blue-500 text-white px-6 py-3 rounded-lg hover:bg-blue-600 transition duration-300"
-    >
-      Continue
-    </button>
-  </div>
-) : (
+          <div className="bg-white bg-opacity-90 p-8 rounded-lg shadow-lg max-w-xl w-full text-center border border-black">
+            <h1 className="text-4xl font-bold text-black mb-6">Welcome to the Bus Timetable App</h1>
+            <p className="text-xl text-gray-700 mb-6">Plan your bus trips with ease. Select a region to get started.</p>
+            <button
+              onClick={() => setCurrentPage(1)}
+              className="bg-blue-500 text-white px-6 py-3 rounded-lg hover:bg-blue-600 transition duration-300"
+            >
+              Continue
+            </button>
+          </div>
+        ) : (
           <>
             {/* Only hide the white container and header when on StopsDisplay (currentPage === 4), but keep the map visible */}
             {currentPage !== 4 && (
-              <div className="bg-white bg-opacity-90 p-6 rounded-lg shadow-lg max-w-4xl w-full">
+              <div className="bg-white bg-opacity-90 p-6 rounded-lg shadow-lg max-w-4xl w-full border border-black">
                 <h1 className="text-4xl font-bold text-black mb-6 text-center">Bus Timetable</h1>
 
                 {loading ? (

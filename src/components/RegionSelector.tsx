@@ -1,5 +1,4 @@
 import React from 'react';
-import { useTheme } from 'next-themes';
 import { Button } from "@/components/ui/button"; // Importing your custom button component
 
 interface RegionSelectorProps {
@@ -9,41 +8,38 @@ interface RegionSelectorProps {
 }
 
 const RegionSelector: React.FC<RegionSelectorProps> = ({ regions, onAreaSelect, onBack }) => {
-
   return (
-    <div className="text-center relative">
-   
-      <Button
-        className="absolute top-4 right-4 px-4 py-2 font-bold rounded-lg shadow-lg transition duration-300 ease-in-out bg-red-500 text-white hover:bg-red-700 hover:shadow-xl"
+    <div className="bg-white bg-opacity-90 p-6 rounded-lg  max-w-4xl w-full">
+      
+      {/* Back Button positioned absolutely in the top-right corner */}
+   {/*    <Button
+        className="absolute top-12 px-4 py-2 font-bold rounded-lg transition duration-300 ease-in-out bg-red-500 text-white hover:bg-red-700"
         onClick={onBack}
       >
         Back
-      </Button>
+      </Button> */}
       
-      <div className="text-center">
-        <h2 className="text-2xl font-semibold mb-6 pb-4 dark:text-white">Choose Your Region</h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-          {regions.length > 0 ? (
-            regions.map((region: any) => (
+      <div className="text-center mb-8">
+      <h2 className="text-base font-semibold mb-2 dark:text-white">Choose Your Region</h2>
+<p className="text-md text-gray-600 dark:text-gray-400">Please select your region below:</p>
+
+      </div>
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+        {regions.length > 0 ? (
+          regions.map((region: any) => (
+            <div key={region.id} className="flex justify-center">
               <Button
-                key={region.id}
-                className="m-2 p-4 rounded-lg shadow-lg transition duration-300 ease-in-out bg-blue-500 text-white hover:bg-blue-700 hover:shadow-xl"
+                className="w-full p-6 rounded-lg transition duration-300 ease-in-out bg-blue-500 text-white hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-50 shadow-md transform hover:scale-105"
                 onClick={() => onAreaSelect(region.id)}
               >
                 {region.region_name}
               </Button>
-            ))
-          ) : (
-            <p className="text-gray-600 dark:text-gray-400">No regions available.</p>
-          )}
-        </div>
-
-        <style jsx>{`
-          .hover\\:bg-light-blue-500:hover {
-            background-color: rgba(173, 216, 230, 0.8); /* Light blue */
-            transition: background-color 0.5s ease-in-out;
-          }
-        `}</style>
+            </div>
+          ))
+        ) : (
+          <p className="text-gray-600 dark:text-gray-400 text-center">No regions available.</p>
+        )}
       </div>
     </div>
   );

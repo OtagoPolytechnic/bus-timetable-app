@@ -51,7 +51,7 @@ const StopsDisplay: React.FC<StopsDisplayProps> = ({
   };
 
   return (
-    <div className="absolute top-8 left-8 bg-white p-6 rounded-lg shadow-lg w-96" style={{ zIndex: 20 }}>
+    <div className="absolute top-8 left-8 bg-white p-6 rounded-lg shadow-lg w-96 border border-black" style={{ zIndex: 20 }}>
       <h2 className="text-2xl font-semibold mb-4 text-center">
         Stops for {selectedService.code}
       </h2>

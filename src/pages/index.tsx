@@ -134,7 +134,7 @@ const Index: React.FC = () => {
         ref={mapContainer}
         className={`absolute top-0 left-0 w-full h-full ${mapLoaded ? 'opacity-100' : 'opacity-0'} transition-opacity duration-1000`}
       />
-
+  
       <div className="relative z-10 flex flex-col justify-center items-center h-full">
         <Image
           src={logo} // Project Logo
@@ -144,74 +144,82 @@ const Index: React.FC = () => {
           className="absolute top-4 left-1/2 transform -translate-x-1/2"
           priority
         />
-
+  
         {/* Show welcome screen for page 0 */}
-        {currentPage === 0 ? (
-          <div className="bg-white bg-opacity-90 p-8 rounded-lg shadow-lg max-w-xl w-full text-center border border-black">
-            <h1 className="text-4xl font-bold text-black mb-6">Welcome to the Otago Regional Bus App</h1>
-            <p className="text-xl text-gray-700 mb-6">Plan your bus trips with ease. Select a region to get started.</p>
-            <button
-              onClick={() => setCurrentPage(1)}
-              className="bg-blue-500 text-white px-6 py-3 rounded-lg hover:bg-blue-600 transition duration-300"
-            >
-              Continue
-            </button>
-          </div>
-        ) : (
-          <>
-            {/* Only hide the white container and header when on StopsDisplay (currentPage === 4), but keep the map visible */}
-            {currentPage !== 4 && (
-              <div className="bg-white bg-opacity-90 p-6 rounded-lg shadow-lg max-w-4xl w-full border border-black">
-                <h1 className="text-4xl font-bold text-black mb-6 text-center">Bus Timetable</h1>
+ {currentPage === 0 ? (
+    <div className="bg-white bg-opacity-90 p-12 rounded-lg shadow-lg max-w-2xl w-full text-center border border-black mx-4">
+      <h1 className="text-4xl font-bold text-black mb-6">Welcome to the Otago Regional Bus App</h1>
+      <p className="text-xl text-gray-700 mb-6">
+        Plan your bus trips with ease. Select a region to get started.
+      </p>
+      <button
+        onClick={() => setCurrentPage(1)}
+        className="bg-blue-500 text-white px-8 py-4 rounded-lg hover:bg-blue-600 transition duration-300 text-lg"
+      >
+        Continue
+      </button>
+    </div>
+  ) : (
+    <>
+      {/* Only hide the white container and header when on StopsDisplay (currentPage === 4), but keep the map visible */}
+      {currentPage !== 4 && (
+        <div className="bg-white bg-opacity-90 p-6 rounded-lg shadow-lg max-w-4xl w-full border border-black relative">
+          <h1 className="text-4xl font-bold text-black text-center mb-6">Bus Timetable</h1> {/* Centered title */}
+          <button
+            onClick={goBack}
+            className="absolute top-4 right-4 bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition duration-300"
+          >
+            Back
+          </button>
 
-                {loading ? (
-                  <p>Loading regions...</p>
-                ) : currentPage === 1 ? (
-                  <RegionSelector regions={regions} onAreaSelect={handleAreaSelect} onBack={goBack} />
-                ) : null}
+          {loading ? (
+            <p>Loading regions...</p>
+          ) : currentPage === 1 ? (
+            <RegionSelector regions={regions} onAreaSelect={handleAreaSelect} onBack={goBack} />
+          ) : null}
 
-                {currentPage === 2 && selectedArea && (
-                  <RouteSelector
-                    selectedArea={selectedArea}
-                    timetableData={timetableData}
-                    onRouteSelect={handleRouteSelect}
-                    onBack={goBack}
-                  />
-                )}
+          {currentPage === 2 && selectedArea && (
+            <RouteSelector
+              selectedArea={selectedArea}
+              timetableData={timetableData}
+              onRouteSelect={handleRouteSelect}
+              onBack={goBack}
+            />
+          )}
 
-                {currentPage === 3 && selectedRoute && (
-                  <ServiceSelector
-                    selectedRoute={selectedRoute}
-                    onServiceSelect={(service) => {
-                      setSelectedService(service);
-                      setCurrentPage(4);
-                    }}
-                    onBack={goBack}
-                  />
-                )}
-              </div>
-            )}
+          {currentPage === 3 && selectedRoute && (
+            <ServiceSelector
+              selectedRoute={selectedRoute}
+              onServiceSelect={(service) => {
+                setSelectedService(service);
+                setCurrentPage(4);
+              }}
+              onBack={goBack}
+            />
+          )}
+        </div>
+      )}
 
-            {/* Keep the map visible, but show StopsDisplay when on page 4 */}
-            {currentPage === 4 && selectedService && (
-              <StopsDisplay
-                selectedService={selectedService}
-                getCurrentDayTrips={getCurrentDayTrips}
-                getStopsForCurrentServiceVersion={getStopsForCurrentServiceVersion}
-                calculateStopTime={calculateStopTime}
-                onBack={goBack}
-              />
-            )}
-          </>
-        )}
+      {/* Keep the map visible, but show StopsDisplay when on page 4 */}
+      {currentPage === 4 && selectedService && (
+        <StopsDisplay
+          selectedService={selectedService}
+          getCurrentDayTrips={getCurrentDayTrips}
+          getStopsForCurrentServiceVersion={getStopsForCurrentServiceVersion}
+          calculateStopTime={calculateStopTime}
+          onBack={goBack}
+        />
+      )}
+    </>
+  )}
 
-        {/* Loading indicator for the map */}
-        {!mapLoaded && (
-          <div className="absolute top-0 left-0 w-full h-full flex items-center justify-center z-20 bg-white bg-opacity-90">
-            <p>Loading map...</p>
-          </div>
-        )}
-      </div>
+  {/* Loading indicator for the map */}
+  {!mapLoaded && (
+    <div className="absolute top-0 left-0 w-full h-full flex items-center justify-center z-20 bg-white bg-opacity-80">
+      <p>Loading map...</p>
+    </div>
+  )}
+</div>
     </div>
   );
 };

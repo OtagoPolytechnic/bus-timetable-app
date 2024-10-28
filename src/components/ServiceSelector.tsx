@@ -8,31 +8,26 @@ interface ServiceSelectorProps {
 
 const ServiceSelector: React.FC<ServiceSelectorProps> = ({ selectedRoute, onServiceSelect, onBack }) => {
   return (
-    <div className="flex flex-col items-center p-6 bg-white rounded-lg w-full max-w-md mx-auto">
-      <h2 className="text-2xl font-semibold mb-4">Services for Route {selectedRoute.title}</h2>
+    <div className="flex flex-col items-center p-8 bg-white bg-opacity-90 rounded-lg w-full max-w-md mx-auto space-y-4">
+      <h2 className="text-base font-semibold mb-2 dark:text-white">Services for Route {selectedRoute.title}</h2>
+      <p className="text-md text-gray-600 mb-6">Please select a service below:</p>
+      
       <div className="grid grid-cols-1 gap-6 w-full">
         {selectedRoute.services && selectedRoute.services.length > 0 ? (
           selectedRoute.services.map((service: any) => (
-            <div
+            <button
               key={service.code}
-              className="p-4 bg-blue-50 rounded-lg transform transition-transform duration-300 hover:scale-105 cursor-pointer border border-transparent hover:border-blue-300"
+              className="relative p-4 bg-blue-500 text-white rounded-lg shadow-lg transition duration-300 ease-in-out hover:bg-blue-700 hover:shadow-xl transform hover:scale-105 w-full text-left"
               onClick={() => onServiceSelect(service)}
             >
-              <h3 className="text-lg font-bold text-blue-600">{`Service ${service.code}`}</h3>
-              <p className="text-sm text-gray-600">{service.direction}</p>
-            </div>
+              <h3 className="text-lg font-bold">{`Service ${service.code}`}</h3>
+              <p className="text-sm text-gray-300">{service.direction}</p>
+            </button>
           ))
         ) : (
           <p className="text-gray-500">No services available for this route.</p>
         )}
       </div>
-      <button
-        className="mt-6 px-4 py-2 text-black font-bold rounded-lg transition-transform duration-300 hover:scale-105"
-        onClick={onBack}
-        style={{ backgroundColor: 'var(--secondary-blue)', color: 'black' }}
-      >
-        Back to Routes
-      </button>
     </div>
   );
 };

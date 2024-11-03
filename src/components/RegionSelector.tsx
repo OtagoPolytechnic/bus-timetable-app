@@ -1,46 +1,46 @@
 import React from 'react';
-import { useTheme } from 'next-themes'; // Import useTheme
-import { Button } from "@/components/ui/button"
+import { Button } from "@/components/ui/button"; // Importing your custom button component
 
 interface RegionSelectorProps {
   regions: any[];
   onAreaSelect: (area: string) => void;
+  onBack: () => void;
 }
 
-const RegionSelector: React.FC<RegionSelectorProps> = ({ regions, onAreaSelect }) => {
-  const { setTheme } = useTheme(); // Destructure setTheme from useTheme hook
-
+const RegionSelector: React.FC<RegionSelectorProps> = ({ regions, onAreaSelect, onBack }) => {
   return (
-    <div className="text-center">
-      <h2 className="text-xl font-semibold mb-6 pb-12 dark:bg-red-400">Choose Your Region</h2>
+    <div className="bg-white bg-opacity-90 p-6 rounded-lg  max-w-4xl w-full">
+      
+      {/* Back Button positioned absolutely in the top-right corner */}
+   {/*    <Button
+        className="absolute top-12 px-4 py-2 font-bold rounded-lg transition duration-300 ease-in-out bg-red-500 text-white hover:bg-red-700"
+        onClick={onBack}
+      >
+        Back
+      </Button> */}
+      
+      <div className="text-center mb-8">
+      <h2 className="text-base font-semibold mb-2 dark:text-white">Choose Your Region</h2>
+<p className="text-md text-gray-600 dark:text-gray-400">Please select your region below:</p>
 
-
-            {/* Use the setTheme function */}
-            <Button className="py-4" onClick={() => setTheme("light")}>
-        LIGHT
-      </Button>
-      <Button className="py-4" onClick={() => setTheme("dark")}>
-        DARK
-      </Button>
-
-
-
-      <div className="grid grid-cols-1 sm:grid-cols-2 ">
-        {regions.length > 0 ? (
-          regions.map((region: any) => (
-            <button
-              key={region.id}
-              className="m-2 p-4 font-bold rounded-lg shadow-lg transform transition-transform duration-300 hover:scale-105 bg-gray-100 font-bold dark:bg-red-500"
-              onClick={() => onAreaSelect(region.id)}
-            >
-              {region.region_name}
-            </button>
-          ))
-        ) : (
-          <p>No regions available.</p>
-        )}
       </div>
 
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+        {regions.length > 0 ? (
+          regions.map((region: any) => (
+            <div key={region.id} className="flex justify-center">
+              <Button
+                className="w-full p-6 rounded-lg transition duration-300 ease-in-out bg-blue-500 text-white hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-50 shadow-md transform hover:scale-105"
+                onClick={() => onAreaSelect(region.id)}
+              >
+                {region.region_name}
+              </Button>
+            </div>
+          ))
+        ) : (
+          <p className="text-gray-600 dark:text-gray-400 text-center">No regions available.</p>
+        )}
+      </div>
     </div>
   );
 };

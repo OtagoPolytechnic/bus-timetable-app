@@ -196,6 +196,14 @@ const Index: React.FC = () => {
         ref={mapContainer}
         className={`absolute top-0 left-0 w-full h-full ${mapLoaded ? 'opacity-100' : 'opacity-0'} transition-opacity duration-1000`}
       />
+
+        {/* Loading indicator for the map */}
+        {!mapLoaded && (
+        <div className="absolute top-0 left-0 w-full h-full flex justify-center items-center bg-white bg-opacity-75 z-20">
+          <div className="loader"></div>
+        </div>
+      )}
+
       <div className="relative z-10 flex flex-col justify-center items-center h-full">
         <Image
           src={logo} // Project Logo

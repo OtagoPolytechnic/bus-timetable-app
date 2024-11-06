@@ -5,10 +5,48 @@ import Image from 'next/image';
 import RegionSelector from '../components/RegionSelector';
 import RouteSelector from '../components/RouteSelector';
 import ServiceSelector from '../components/ServiceSelector';
-import StopsDisplay from '../components/StopsDisplay';
 import logo from '/public/App.png';
 
 mapboxgl.accessToken = process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN || 'pk.eyJ1IjoiemFjYm1yMjIiLCJhIjoiY2x5ZHRtZDJqMDVsNDJrb3VmZWZoMG9yciJ9.Vid6j50Ey1xMLT6n6g6AgQ';
+
+type Day = {
+  day: string;
+};
+
+type Trip = {
+  service_version: number;
+  start_time: string;
+  days: Day[];
+};
+
+type Stop = {
+  stop_id: number;
+  order: number;
+  increment: number;
+  address: string;
+  lat: number;
+  long: number;
+};
+
+type ServiceVersion = {
+  version: number;
+  stops: Stop[];
+};
+
+type Service = {
+  code: string;
+  direction: string;
+  trips: Trip[];
+  service_versions: ServiceVersion[];
+};
+
+type Route = {
+  route_id: number;
+  title: string;
+  is_school_run: boolean;
+  locations: string;
+  services: Service[];
+};
 
 const Index: React.FC = () => {
   const [selectedArea, setSelectedArea] = useState<string | null>(null);
@@ -20,7 +58,7 @@ const Index: React.FC = () => {
   const [mapLoaded, setMapLoaded] = useState(false);
   const [loading, setLoading] = useState<boolean>(true);
   const [isLoadingStops, setIsLoadingStops] = useState<boolean>(false); // New loading state for stops display
-
+  const [visibleColumn, setVisibleColumn] = useState<number>(0);
   const mapContainer = useRef<HTMLDivElement | null>(null);
   const mapInstance = useRef<mapboxgl.Map | null>(null);
 
@@ -72,7 +110,6 @@ const Index: React.FC = () => {
 
   // Handle region selection
   const handleAreaSelect = (area: string) => {
-    console.log("Selected area:", area);
     setSelectedArea(area);
     setSelectedRoute(null);
     setSelectedService(null);
@@ -100,8 +137,7 @@ const Index: React.FC = () => {
   // Handle service selection
   const handleServiceSelect = async (service: any) => {
     setIsLoadingStops(true); // Start loading animation
-    // Simulate a loading delay (e.g., fetching data)
-    await new Promise(resolve => setTimeout(resolve, 1000)); 
+    await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate loading delay
     setSelectedService(service);
     setCurrentPage(4);
     setIsLoadingStops(false); // End loading animation
@@ -128,13 +164,27 @@ const Index: React.FC = () => {
     return versionData ? versionData.stops : [];
   };
 
-  // Calculate stop times
+  const handleNextColumn = () => {
+    setVisibleColumn((prevColumn) => prevColumn + 1);
+  };
+
+  const handlePrevColumn = () => {
+    if (visibleColumn > 0) {
+      setVisibleColumn((prevColumn) => prevColumn - 1);
+    }
+  };
+
   const calculateStopTime = (startTime: string, increment: number) => {
+    if (!startTime || typeof startTime !== 'string') {
+      console.error('Invalid startTime:', startTime); // Log invalid startTime for debugging
+      return ''; // Return an empty string or some default value if startTime is invalid
+    }
+  
     const [hours, minutes] = startTime.split(':').map(Number);
     const tripStartTime = new Date();
     tripStartTime.setHours(hours);
     tripStartTime.setMinutes(minutes);
-
+  
     const stopTime = new Date(tripStartTime.getTime() + increment * 60000);
     return stopTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true });
   };
@@ -155,7 +205,7 @@ const Index: React.FC = () => {
           className="absolute top-4 left-1/2 transform -translate-x-1/2"
           priority
         />
-
+  
         {/* Show welcome screen for page 0 */}
         {currentPage === 0 ? (
           <div className="bg-white bg-opacity-90 p-12 rounded-lg shadow-lg max-w-2xl w-full text-center border border-black mx-4">
@@ -182,13 +232,13 @@ const Index: React.FC = () => {
                 >
                   Back
                 </button>
-
+  
                 {loading ? (
                   <p>Loading regions...</p>
                 ) : currentPage === 1 ? (
                   <RegionSelector regions={regions} onAreaSelect={handleAreaSelect} onBack={goBack} />
                 ) : null}
-
+  
                 {currentPage === 2 && selectedArea && (
                   <RouteSelector
                     selectedArea={selectedArea}
@@ -197,7 +247,7 @@ const Index: React.FC = () => {
                     onBack={goBack}
                   />
                 )}
-
+  
                 {currentPage === 3 && selectedRoute && (
                   <ServiceSelector
                     selectedRoute={selectedRoute}
@@ -208,28 +258,72 @@ const Index: React.FC = () => {
               </div>
             )}
 
-            {/* Keep the map visible, but show StopsDisplay when ready */}
-            {currentPage === 4 && (
-              <StopsDisplay
-                selectedService={selectedService}
-                getCurrentDayTrips={getCurrentDayTrips}
-                getStopsForCurrentServiceVersion={getStopsForCurrentServiceVersion}
-                calculateStopTime={calculateStopTime}
-                onBack={goBack}
-              />
+            {/* Loading spinner for stops page */}
+        {isLoadingStops && (
+          <div className="absolute top-0 left-0 w-full h-full flex justify-center items-center bg-white bg-opacity-75 z-20">
+            <div className="loader"></div>
+          </div>
+        )}
+  
+            {currentPage === 4 && selectedService && (
+              <div className="w-full md:w-1/2 lg:w-1/3 h-3/4 bg-white p-6 rounded-lg shadow-lg absolute top-20 left-5 sm:left-10">
+                <h2 className="text-2xl md:text-3xl font-semibold mb-6 text-center">
+                  Stops for {selectedService.code}
+                </h2>
+  
+                <div className="flex justify-between items-center mb-4">
+                  <button
+                    className="px-2 md:px-4 py-2 bg-blue-500 text-white font-bold rounded-lg shadow-lg"
+                    onClick={handlePrevColumn}
+                    disabled={visibleColumn === 0}
+                  >
+                    &lt;
+                  </button>
+                  <button
+                    className="px-2 md:px-4 py-2 bg-blue-500 text-white font-bold rounded-lg shadow-lg"
+                    onClick={handleNextColumn}
+                  >
+                    &gt;
+                  </button>
+                </div>
+  
+                {/* Stops Table */}
+                <table className="min-w-full table-auto">
+                  <thead className="bg-gray-50">
+                    <tr>
+                      <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">Stop Name</th>
+                      <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">Time</th>
+                    </tr>
+                  </thead>
+                  <tbody className="bg-white divide-y divide-gray-200">
+                    {getCurrentDayTrips(selectedService).map((trip: any, index: number) => (
+                      <React.Fragment key={index}>
+                        {getStopsForCurrentServiceVersion(selectedService, trip.service_version).map((stop: any, stopIndex: number) => (
+                          <tr key={stopIndex}>
+                            <td className="px-6 py-4 text-sm text-gray-700">{stop.address}</td>
+                            <td className="px-6 py-4 text-sm text-gray-700">
+                              {calculateStopTime(trip.start_time, stop.increment + visibleColumn * 30)}
+                            </td>
+                          </tr>
+                        ))}
+                      </React.Fragment>
+                    ))}
+                  </tbody>
+                </table>
+  
+                <button
+                  className="mt-6 px-4 py-2 bg-gradient-to-r from-red-500 to-pink-500 text-white font-bold rounded-lg shadow-lg"
+                  onClick={goBack}
+                >
+                  Back to Services
+                </button>
+              </div>
             )}
           </>
         )}
-
-        {/* Show loading animation when loading stops display */}
-        {isLoadingStops && (
-          <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-20">
-            <div className="loader"></div> 
-          </div>
-        )}
       </div>
     </div>
+    
   );
-};
-
-export default Index;
+}
+  export default Index;

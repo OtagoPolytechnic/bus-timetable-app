@@ -320,7 +320,7 @@ const Index: React.FC = () => {
                 </table>
   
                 <button
-                  className="mt-6 px-4 py-2 bg-gradient-to-r from-red-500 to-pink-500 text-white font-bold rounded-lg shadow-lg"
+                  className="absolute top-4 right-4 bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition duration-300"
                   onClick={goBack}
                 >
                   Back to Services
